@@ -45,10 +45,10 @@
     "transform": "cr:transform"
   },
   "@type": "sc:Dataset",
-  "name": "gpt-3",
+  "name": "CodeUpdateArena",
   "description": "Large language models (LLMs) are increasingly being used to synthesize and reason about source code. However, the static nature of these models' knowledge does not reflect the fact that libraries and API functions they invoke are continuously evolving, with functionality being added or changing. While numerous benchmarks evaluate how LLMs can generate code, no prior work has studied how an LLMs' knowledge about code API functions can be updated. To fill this gap, we present CodeUpdateArena, a benchmark for knowledge editing in the code domain. An instance in our benchmark consists of a synthetic API function update paired with a program synthesis example that uses the updated functionality; our goal is to update an LLM to be able to solve this program synthesis example without providing documentation of the update at inference time. Compared to knowledge editing for facts encoded in text, success here is more challenging: a code LLM must correctly reason about the semantics of the modified function rather than just reproduce its syntax. Our dataset is constructed by first prompting GPT-4 to generate atomic and executable function updates. Then, for each update, we generate program synthesis examples whose code solutions are prone to use the update. Our benchmark covers updates of various types to 52 functions from six diverse Python packages, with a total of 577 program synthesis examples. Our experiments show that prepending documentation of the update to open-source code LLMs (i.e., DeepSeek, CodeLlama) does not allow them to incorporate changes for problem solving, and existing knowledge editing techniques also have substantial room for improvement. We hope our benchmark will inspire new methods for knowledge updating in code LLMs.",
   "conformsTo": "http://mlcommons.org/croissant/1.0",
-  "url": "https://github.com/openai/gpt-3",
+  "url": "https://anonymous.4open.science/r/CodeUpdateArena-73B3/",
   "distribution": [
     {
       "@type": "cr:FileObject",
