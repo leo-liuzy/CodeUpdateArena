@@ -1,0 +1,10 @@
+source: null
+include_update: true
+include_test: true
+num_few_shot_examples: 0
+few_shot_example_pool_size: 0
+num_public_unit_tests: 1
+
+num_unit_tests_fewshot: 1
+few_shot_examples_strategy: ${..data.train_test_swap_strategy}
+random_few_shot_examples: True

@@ -1,0 +1,31 @@
+[INST]
+{% if include_update -%}
+Update note:
+There's an recent update to a function `{{old_function_signature}}` --- {{update_description}}. The function now has a new function signature --- `{{new_function_signature}}`.
+Here's a detailed documentation about the update:
+[DOC]
+{{update_docstring}}
+[/DOC]
+
+{% endif %}
+Your task is to write a Python solution to a problem in a real-world scenario.
+The Python code must be between [PYTHON] and [/PYTHON] tags.
+
+Scenario: {{example_scenario}}
+Problem: {{example_problem}}
+Solution signature: {{example_solution_signature}}
+[TEST]
+{{example_unit_tests}}
+[/TEST]
+[/INST]
+[PYTHON]
+{{example_solution}}
+[/PYTHON]
+
+[INST] Scenario: {{scenario}}
+Problem: {{problem}}
+Solution signature: {{solution_signature}}
+[TEST]
+{{unit_tests}}
+[/TEST]
+[/INST]

@@ -1,0 +1,5 @@
+data_dir: <need specify>
+data_file: ${.data_dir}/3swaps_v3
+data_split: "80:10"
+train_test_swap_strategy: diff
+tested_swap: "['max', 'min']"

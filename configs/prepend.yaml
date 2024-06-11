@@ -1,0 +1,26 @@
+defaults:
+  - data: prepend
+  - model: prepend
+  - generation: prepend
+  - prompt: zero-shot
+  - evaluation: default
+  - _self_
+
+data:
+  data_dir: data/prelim/CodeUpdateArena-after-PS
+model:
+  model_name_or_path: <path to checkpoint directory>
+evaluation:
+  n_decoding_example: 5
+
+output_dir:
+
+prompt:
+  source: prompts/instruction_style_one_shot.jinja2
+  num_few_shot_examples: 1
+  num_public_unit_tests: 1
+
+seed: 42
+# gpu_id: 0
+debug: false
+rerun_eval: false

@@ -1,0 +1,13 @@
+
+# for Greedy search, disable sampling
+do_sample: True
+top_p: 0.7
+top_k: 
+temperature: 0.8
+# upper bounded by n
+num_return_sequences: 10
+batch_size: 4
+# Control the length of generation
+max_new_tokens: 512
+# Do not return inputs when decoding the generated tokens
+return_full_text: False

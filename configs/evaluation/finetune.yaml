@@ -1,0 +1,7 @@
+defaults:
+  - default
+  - _self_
+
+test_set_size: 15
+# next line is only for debugging
+eval_on_train: false

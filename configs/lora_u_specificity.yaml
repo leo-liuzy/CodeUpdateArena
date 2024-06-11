@@ -1,0 +1,41 @@
+defaults:
+  - data: finetune
+  - model: lora
+  - generation: prepend
+  - prompt: finetune
+  - evaluation: default
+  - training: lora
+  - _self_
+
+
+training: 
+  batch_size: 1
+  lr: 1e-3
+  # lr: 6e-3
+  # batch_size: 8
+  # num_epoch: 10
+
+model:
+  model_name_or_path: <path to checkpoint directory>
+evaluation:
+  n_decoding_example: 5
+
+output_dir: tmp/chkpt_null
+
+data:
+  data_dir: data/prelim/CodeUpdateArena-after-dedup
+  training_example_per_update: 0
+
+prompt:
+  train_source: prompts/instruction_style_ft_no_ps_train.jinja2
+  eval_source: prompts/humaneval.jinja2
+  num_few_shot_examples: 1
+  num_public_unit_tests: 1
+
+usage: specificity
+
+
+seed: 42
+# gpu_id: 0
+debug: false
+rerun_eval: false
