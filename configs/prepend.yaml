@@ -6,11 +6,11 @@ defaults:
   - evaluation: default
   - _self_
 
-data:
-  data_dir: data/prelim/CodeUpdateArena-after-dedup
-
 model:
-  model_name_or_path: /u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+  model_name_or_path: # hf model id or path to model
+
+data:
+  data_dir: # hf dataset id or path to data
 
 output_dir:
 

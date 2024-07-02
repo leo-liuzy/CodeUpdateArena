@@ -12,15 +12,14 @@ training:
   batch_size: 8
 
 model:
-  model_name_or_path: /u/zliu/datastor1/shared_resources/models/llama2/hf/CodeLlama-7b-Instruct-hf
-
-output_dir: tmp/chkpt_null
+  model_name_or_path: # hf model id or path to model
 
 data:
-  data_dir: data/prelim/CodeUpdateArena-after-dedup
+  data_dir: # hf dataset id or path to data
   training_example_per_update: 1
   test_example_per_update: 1
-  
+
+output_dir: tmp/chkpt_null  
 
 prompt:
   train_source: prompts/instruction_style_ft_k_ps.jinja2
