@@ -1,0 +1,42 @@
+defaults:
+  - data: finetune
+  - model: lora
+  - generation: prepend
+  - prompt: finetune
+  - evaluation: default
+  - training: lora
+  - _self_
+
+
+
+training: 
+  batch_size: 1
+  # lr: 6e-3
+  # batch_size: 8
+  # num_epoch: 10
+
+model:
+  # model_name_or_path: /Users/leoliu/proj/shared_resources/CodeLlama-7b-Python-hf
+  # model_name_or_path: /home/zliu/shared_resources/models/llama2/hf/CodeLlama-7b-Instruct-hf
+  model_name_or_path: /u/zliu/datastor1/shared_resources/models/llama2/hf/CodeLlama-7b-Instruct-hf
+  # model_name_or_path: /home/zliu/shared_resources/models/llama2/hf/CodeLlama-13b-Instruct-hf
+  # model_name_or_path: /home/zliu/shared_resources/models/llama2/hf/CodeLlama-34b-Instruct-hf
+
+output_dir: tmp/chkpt_null
+
+data:
+  # data_dir: /Users/leoliu/proj/tool-KE/data/swap
+  data_dir: data/prelim/pilot_run/gpt-4/13-functions-3-calls-w-v2.1-fixed-auto_select/prog_syn_v2.1-first_draft
+  inspect_dir: tmp_inspect_ft
+  training_example_per_update: 0
+
+prompt:
+  train_source: prompts/instruction_style_ft_no_ps_train.jinja2
+  eval_source: prompts/instruction_style_ft_no_ps_eval.jinja2
+  num_few_shot_examples: 1
+  num_public_unit_tests: 1
+
+seed: 42
+# gpu_id: 0
+debug: false
+rerun_eval: false

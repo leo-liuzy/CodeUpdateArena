@@ -1,0 +1,27 @@
+defaults:
+  - data: prepend
+  - model: prepend
+  - generation: prepend
+  - prompt: zero-shot
+  - evaluation: default
+  - _self_
+
+data:
+  # data_dir: /Users/leoliu/proj/tool-KE/data/swap
+  data_dir: data/prelim/pilot_run/gpt-4/13-functions-3-calls-w-v2.1-fixed-auto_select/prog_syn_v2.1-first_draft
+  inspect_dir: tmp_inspect
+model:
+  # model_name_or_path: /Users/leoliu/proj/shared_resources/CodeLlama-7b-Python-hf
+  model_name_or_path: /u/zliu/datastor1/shared_resources/models/llama2/hf/CodeLlama-7b-Instruct-hf
+
+output_dir:
+
+prompt:
+  source: prompts/instruction_style_one_shot.jinja2
+  num_few_shot_examples: 1
+  num_public_unit_tests: 1
+
+seed: 42
+# gpu_id: 0
+debug: false
+rerun_eval: false

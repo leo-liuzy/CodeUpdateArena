@@ -1,9 +1,10 @@
 defaults:
-  - data: prepend
-  - model: prepend
+  - data: finetune
+  - model: finetune
   - generation: prepend
-  - prompt: few-shot
-  - evaluation: default
+  - prompt: finetune
+  - evaluation: finetune
+  - training: lora
   - _self_
 
 data:
@@ -14,6 +15,7 @@ model:
   model_name_or_path: /home/zliu/shared_resources/models/llama2/hf/CodeLlama-7b-Instruct-hf
 
 output_dir:
+chkpt_dir: 
 
 seed: 42
 # gpu_id: 0

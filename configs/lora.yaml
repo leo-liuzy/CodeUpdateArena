@@ -1,9 +1,10 @@
 defaults:
-  - data: prepend
-  - model: prepend
+  - data: finetune
+  - model: lora
   - generation: prepend
-  - prompt: few-shot
+  - prompt: finetune
   - evaluation: default
+  - training: lora
   - _self_
 
 data:

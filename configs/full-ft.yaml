@@ -1,9 +1,10 @@
 defaults:
-  - data: prepend
-  - model: prepend
+  - data: finetune
+  - model: finetune
   - generation: prepend
-  - prompt: few-shot
+  - prompt: finetune
   - evaluation: default
+  - training: full-ft
   - _self_
 
 data:

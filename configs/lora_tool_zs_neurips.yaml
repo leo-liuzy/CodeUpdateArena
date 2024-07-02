@@ -16,7 +16,11 @@ training:
   # num_epoch: 10
 
 model:
-  model_name_or_path: <path to checkpoint directory>
+  # model_name_or_path: /Users/leoliu/proj/shared_resources/CodeLlama-7b-Python-hf
+  # model_name_or_path: /home/zliu/shared_resources/models/llama2/hf/CodeLlama-7b-Instruct-hf
+  model_name_or_path: /u/zliu/datastor1/shared_resources/models/llama2/hf/CodeLlama-7b-Instruct-hf
+  # model_name_or_path: /home/zliu/shared_resources/models/llama2/hf/CodeLlama-13b-Instruct-hf
+  # model_name_or_path: /home/zliu/shared_resources/models/llama2/hf/CodeLlama-34b-Instruct-hf
 evaluation:
   n_decoding_example: 5
 
