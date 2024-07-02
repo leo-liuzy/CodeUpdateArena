@@ -19,7 +19,7 @@ from datasets import load_dataset
 
 from src.execution.safe_execution_util import execute
 from src.experiments.ft_model import FinetunedModel, FinetunedCodeLlama
-from src.data.code_utils import concat_and_exec
+from src.utils.code import concat_and_exec
 from src.utils.prompt_tool import CodeGenTemplate, InstructTemplate
 
 

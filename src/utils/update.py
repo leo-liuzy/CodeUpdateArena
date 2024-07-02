@@ -19,7 +19,7 @@ import sys
 # from data.prelim.prompt import doc_summarization_prompt
 from src.utils.utils import call_openai_chat
 from src.data.prompt_update import PYTHON_INDENT, doc_summarization_prompt, arguments_writer_sys_prompt, arguments_writer_input_prompt
-from src.data.code_utils import concat_and_exec
+from src.utils.code import concat_and_exec
 from copy import deepcopy
 from inspect import signature
 

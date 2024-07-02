@@ -457,11 +457,12 @@ class OneShotTestBed(TestBed):
     
 def generate_text(cfg):
     test_bed = OneShotTestBed(cfg, cache_prefix="neurips_base")
-    # prepend_model = PrependCodeLlama(cfg)
-    prepend_model = PrependGPT4(cfg)
+    prepend_model = PrependCodeLlama(cfg)
+    # prepend_model = PrependGPT4(cfg)
     proj_root = os.path.dirname(__file__) + "/../.."
     # df, grouped_df = test_bed.evaluate(prepend_model)
-    test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/evaluate_base/FT-0_n={cfg.evaluation.n_decoding_example}_lr=0.001_noUpdate")
+    # test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/evaluate_base/FT-0_n={cfg.evaluation.n_decoding_example}_lr=0.001_noUpdate")
+    test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/evaluate_base/prepend_n={cfg.evaluation.n_decoding_example}")
     
     
 def run_exec(cfg):
