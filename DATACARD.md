@@ -59,7 +59,7 @@ An example of a dataset instance:
         'docstring': "The functionality remains the same as the original 'select_dtypes' function....",
         'signature': 'pandas.DataFrame.filter_by_dtypes(self, include=None, exclude=None) -> Self',
         'imports': "import numpy\nimport pandas\n...\nold_select_dtypes = pandas.DataFrame.select_dtypes\nsetattr(pandas.DataFrame, 'old_select_dtypes', old_select_dtypes)",
-        'implementation': 'def filter_by_dtypes(self, include=None, exclude=None):\n...\nreturn self.old_select_dtypes(include=include, exclude=exclude)\n',
+        'implementation': 'def filter_by_dtypes(self, include=None, exclude=None):\n...',
         'unit_tests': 'def test_filter_type_int64():\n    ....',
         'update_type': 'modify-function-name',
         'function_path': 'pandas.DataFrame.select_dtypes',
