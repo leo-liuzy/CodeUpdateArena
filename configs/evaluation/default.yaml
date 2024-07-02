@@ -1,6 +1,6 @@
 pass_at_ks: [1, 2, 5, 10] # [1, 5, 10, 100]
 n_decoding_multiplier: 1
-n_decoding_example: 10
+n_decoding_example: 5
 # each decoding could contain multiple solution
 choose_strategy: random
 exec_timeout: 30
