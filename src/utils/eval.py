@@ -6,10 +6,7 @@ from typing import Dict, Any, Union, Tuple, List
 from collections import defaultdict
 
 import numpy as np
-from loguru import logger 
 import pandas as pd
-from src.utils import Config
-from copy import deepcopy
 import seaborn as sns
 import matplotlib.pyplot as plt
 from omegaconf import DictConfig, OmegaConf
@@ -17,7 +14,6 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from datasets import load_dataset
 
-from src.execution.safe_execution_util import execute
 from src.models.ft_model import FinetunedModel, FinetunedCodeLlama
 from src.utils.code import concat_and_exec
 from src.utils.prompt import CodeGenTemplate, InstructTemplate

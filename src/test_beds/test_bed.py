@@ -13,15 +13,15 @@ from typing import List, Callable
 from loguru import logger
 from collections import defaultdict
 
-from src.data.manager_update import UpdateManagerV2, UpdateManagerV21
+from src.data.manager_update import UpdateManager
 from src.data.manager_prog_syn import ProgSynManagerV2
 
 from src.models.prepend_model import PrependModel, PrependCodeLlama, PrependGPT4
 
 from src.utils.prompt import CodeGenTemplate, InstructTemplate
 from src.utils.cache import SQLiteCache
-from src.utils.eval_utils import pass_at_k
-from src.utils.args import set_random_seed
+from src.utils.eval import pass_at_k
+from src.utils.utils import set_random_seed
 from src.utils.update import UpdatedFunction
 from src.utils.code import (
     Function,
@@ -101,7 +101,7 @@ class TestBed:
     @classmethod
     def check_unit_tests(
         cls,
-        update_manager: UpdateManagerV2,
+        update_manager: UpdateManager,
         imports: List[str],
         unit_tests: List[Function],
         tested_function: Function,
@@ -182,16 +182,9 @@ class TestBed:
         def helper(helper_test_reports: List[UnitTestsReport], ks: List[int], program_api_usages: List[bool] = None):
             ret = {}
             prefix = ""
-            # prefix = "general"
-            # if program_api_usages is not None:
-            #     prefix = "restricted"
-            
-            # if program_api_usages is not None:
-            #     helper_test_reports = [test_report for test_report, usage in zip(helper_test_reports, program_api_usages) if usage]
-            #     ret["restricted_n"] = len(helper_test_reports)
-                
+
             n = len(helper_test_reports)
-            # c = sum(test_report.all_pass_w_update for test_report in helper_test_reports)
+
             c_old_excl = sum(
                 test_report.all_pass_wo_update and not test_report.all_pass_w_update
                 for test_report in helper_test_reports
@@ -217,9 +210,7 @@ class TestBed:
                 
                 ret[f"{prefix}pass@{k}(old)"] = np.nan if n == 0 or c_old > n else pass_at_k(n, c_old, k) * 100
 
-                ret[f"{prefix}pass@{k}(old excl.)"] = np.nan if n == 0 or c_old_excl > n else pass_at_k(n, c_old_excl, k) * 100
-    
-                # ret[f"{prefix}pass@{k}(unsolved)"] = np.nan if n == 0 or c_unsolved > n else pass_at_k(n, c_unsolved, k)                
+                ret[f"{prefix}pass@{k}(old excl.)"] = np.nan if n == 0 or c_old_excl > n else pass_at_k(n, c_old_excl, k) * 100        
                 
             accuracies = [test_report.pass_w_update_rate for test_report in helper_test_reports]
             ret[f"{prefix}accuracy_mean"] = np.mean(accuracies) * 100
@@ -237,11 +228,6 @@ class TestBed:
             return ret
         
         general_agg_result = helper(test_reports, ks, None)
-        
-        # TODO: this matching is super stupid... think of a better one.
-        # program_api_usages = [f".{update_manager.updated_function.function_name}" in generated_program for generated_program in generated_programs]
-        # restricted_agg_result = helper(test_reports, ks, program_api_usages)
-        # assert all(k not in general_agg_result for k in restricted_agg_result.keys())
         
         return {
             **general_agg_result,

@@ -1123,7 +1123,7 @@ if __name__ == "__main__":
         save_dir = f"{save_root}/{api_path}/{update_type_tag}/{pack_id}"
         print(f"Save dir: {save_dir}")
         os.makedirs(save_dir, exist_ok=True)
-        cfg = OmegaConf.load("configs/update_generation_v2-1.yaml")
+        cfg = OmegaConf.load("configs/update_generation.yaml")
         cfg.new_impl.max_rej_sample=6
         u_manager = UpdateManager(cfg=cfg, api_path=api_path, update_tag=update_type_tag)
         u_manager.generate_and_initialize(save_dir=save_dir, rerun_exec=True)

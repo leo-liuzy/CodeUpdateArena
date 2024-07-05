@@ -22,13 +22,13 @@ from transformers import TrainingArguments
 from trl import SFTTrainer
 from datasets import load_dataset
 
-from src.data.manager_update import UpdateManagerV2, UpdateManagerV21
-from src.data.manager_prog_syn import ProgSynManagerV2
+from src.data.manager_update import UpdateManager
+from src.data.manager_prog_syn import ProgSynManager
 from src.utils.update import UpdatedFunction
 from src.utils.code import Function
 from src.utils.prompt import InstructTemplate
 from src.utils.eval import eval_on_humaneval
-from src.utils.args import set_random_seed
+from src.utils.utils import set_random_seed
 from src.test_beds.test_bed import TestBed
 from src.models.ft_model import FinetunedModel, FinetunedCodeLlama
 
@@ -637,7 +637,7 @@ class FTTestBed(TestBed):
         eval_results = {}
         
         if run_exec:
-            u_manager = UpdateManagerV2(cfg=self.update_cfg, api_path=datum["update"]["api_path"], update_tag=datum["update"]["update_type"])
+            u_manager = UpdateManager(cfg=self.update_cfg, api_path=datum["update"]["api_path"], update_tag=datum["update"]["update_type"])
             u_manager.load_from_dict(datum["update"])
 
             # Run every program against unit tests
