@@ -1,0 +1,11 @@
+{
+    "api_path": "math.sqrt",
+    "arguments_str": "x,/",
+    "doc_string": "Return the square root of x.",
+    "imports": [
+        "import math"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function Name: sqrt(x)\n\nDescription: This function returns the square root of a given number x. \n\nInput Parameter:\nx: The input parameter \"x\" should be a numeric or complex type. If x is not a number, or if a complex number with a negative real component is passed in, an exception will occur.\n\nOutput: \nThis function returns the square root of x. The output will be of the same type as the input.\n\nSample code:\n```python\nimport math\nprint(math.sqrt(9)) # Output: 3.0\n```\n\nPlease note that it's suggested to handle exception scenarios - such as input not being numeric or complex - in your implementations."
+}

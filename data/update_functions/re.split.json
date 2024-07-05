@@ -1,0 +1,11 @@
+{
+    "api_path": "re.split",
+    "arguments_str": "pattern,string,maxsplit=0,flags=0",
+    "doc_string": "Split the source string by the occurrences of the pattern,\nreturning a list containing the resulting substrings.  If\ncapturing parentheses are used in pattern, then the text of all\ngroups in the pattern are also returned as part of the resulting\nlist.  If maxsplit is nonzero, at most maxsplit splits occur,\nand the remainder of the string is returned as the final element\nof the list.",
+    "imports": [
+        "import re"
+    ],
+    "return_type_hint": "",
+    "source_code": "def split(pattern, string, maxsplit=0, flags=0):\n    \"\"\"Split the source string by the occurrences of the pattern,\n    returning a list containing the resulting substrings.  If\n    capturing parentheses are used in pattern, then the text of all\n    groups in the pattern are also returned as part of the resulting\n    list.  If maxsplit is nonzero, at most maxsplit splits occur,\n    and the remainder of the string is returned as the final element\n    of the list.\"\"\"\n    return _compile(pattern, flags).split(string, maxsplit)\n",
+    "summarized_doc": "Function Name: split()\n\nDescription: This function splits a source string by the occurrences of a specific pattern. It returns a list containing the resulting substrings. \n\nInput Parameters:\n1. pattern (str): The specific pattern where the string is split. If capturing parentheses are used in the pattern, then the text of all groups in the pattern are also returned as part of the resulting list. \n2. maxsplit (int, optional): If maxsplit is nonzero, at most maxsplit splits occur, and the remainder of the string is returned as the final element of the list. By default, it is set to 0 which means unlimited splits.\n\nOutput: \nA list of substrings split based on the provided pattern. If maxsplit was nonzero, the remainder of the string would be the final element in the list.\n\nExample code: \n\n```python\nimport re\ntext = \"Hello, world. This is a test.\"\npattern = '\\s'\nprint(re.split(pattern, text, maxsplit=2))\n```\n\nThis would output:\n\n`['Hello,', 'world.', 'This is a test.']`\n\nThis example splits the text at whitespace characters. As maxsplit is set to 2, only 2 splits occur and the remaining string is returned as the last element in the list."
+}

@@ -1,0 +1,11 @@
+{
+    "api_path": "itertools.permutations",
+    "arguments_str": "iterable,r=None",
+    "doc_string": "Return successive r-length permutations of elements in the iterable.\n\npermutations(range(3), 2) --> (0,1), (0,2), (1,0), (1,2), (2,0), (2,1)",
+    "imports": [
+        "import itertools"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function: permutations()\n\nDescription: \nThe permutations() function returns successive r-length permutations of elements in the iterable. If r is not specified or is None, then r defaults to the length of the iterable and all possible full-length permutations are generated. \n\nThe permutations() function generates unique permutations where the order of elements matters. Elements are treated as unique based on their position, not on their value. So if the input elements are unique, there will be no repeat values in each permutation.\n\nInput:\n1. iterable: A sequence, collection, or an iterator object to generate all possible permutations from. \n2. r: An integer specifying the length of the permutations. If r is not specified or is None, r defaults to the length of the iterable.\n\nOutput:\nThe function will return an iterator that produces tuples of length r. \n\nFor instance:\n```python\nfrom itertools import permutations\nprint(list(permutations(range(3), 2)))\n```\nThis will output:\n```python\n[(0,1), (0,2), (1,0), (1,2), (2,0), (2,1)]\n```\nIn this case, `range(3)` is the iterable and 2 is the length of permutations. So function returns all possible 2-length permutations of elements in `range(3)`."
+}

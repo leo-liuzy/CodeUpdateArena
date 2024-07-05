@@ -1,0 +1,11 @@
+{
+    "api_path": "math.comb",
+    "arguments_str": "n,k,/",
+    "doc_string": "Number of ways to choose k items from n items without repetition and without order.\n\nEvaluates to n! / (k! * (n - k)!) when k <= n and evaluates\nto zero when k > n.\n\nAlso called the binomial coefficient because it is equivalent\nto the coefficient of k-th term in polynomial expansion of the\nexpression (1 + x)**n.\n\nRaises TypeError if either of the arguments are not integers.\nRaises ValueError if either of the arguments are negative.",
+    "imports": [
+        "import math"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function: comb(n, k)\n\nDescription:\nThis function calculates the number of ways to choose 'k' items from 'n' items without repetition and order. It essentially computes the binomial coefficient, often encountered in combinatorial scenarios. The operation is equivalent to n! / (k! * (n - k)!) when 'k' <= 'n', and returns zero when 'k' > 'n'. This value corresponds to the coefficient of the 'k'-th term in the polynomial expansion of the expression (1 + x)**n.\n\nInput:\n1. n: Integer. The total number of items.\n2. k: Integer. The number of items to choose.\n\nOutput:\nReturns the number of ways to choose 'k' items from 'n' items, an integer.\n\nExceptions:\n1. Raises TypeError if either 'n' or 'k' is not an integer.\n2. Raises ValueError if either 'n' or 'k' is negative.\n\nExample:\n```python\nfrom math import comb\nn = 5\nk = 3\nprint(comb(n, k))  # Output: 10\n```\nIn the above case, there are 10 ways to choose 3 items from 5."
+}

@@ -1,7 +1,7 @@
 import jinja2
 from src.utils import create_test_calls
 from typing import List
-from data.prelim.prompt_v2_update import NUM_UNIT_TESTS, PYTHON_INDENT, construct_instruction_series
+from src.data.prompt_update import NUM_UNIT_TESTS, PYTHON_INDENT, construct_instruction_series
 # below are Prompt template
 environment = jinja2.Environment()
 

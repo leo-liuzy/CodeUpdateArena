@@ -1,0 +1,11 @@
+{
+    "api_path": "itertools.tee",
+    "arguments_str": "iterable,n=2,/",
+    "doc_string": "Returns a tuple of n independent iterators.",
+    "imports": [
+        "import itertools"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function Name: itertools.tee()\n\nDescription:\nThe function `itertools.tee()` from the `itertools` library in Python is used to return n independent iterators from a single iterable input. Each returned iterator is a clone of the original iterable. They can iterate over the cloned content independently.\n\nInput Parameters:\n1. iterable [Required]: This is the input object you want to clone. It could be any object that can be iterated over.\n2. n [Optional, Default = 2]: The number of independent iterators you want to make. It must be an integer.\n\nOutput:\nIt returns a tuple containing n independent iterators.\n\nIllustrative Code:\n```\nimport itertools\n\ndata = [1, 2, 3, 4, 5]\niter1, iter2 = itertools.tee(data)\nfor value in iter1:\n    print(value) # prints 1,2,3,4,5\n  \n\nfor value in iter2:\n    print(value) # prints 1,2,3,4,5  \n```\n\nNote: The input iterable should not be used after the tee() function is called because it could lead to unexpected results. You must only use the returned iterator clones."
+}

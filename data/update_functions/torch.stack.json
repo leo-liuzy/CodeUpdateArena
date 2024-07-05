@@ -1,0 +1,11 @@
+{
+    "api_path": "torch.stack",
+    "arguments_str": "tensors,dim=0,*,out=None",
+    "doc_string": "stack(tensors, dim=0, *, out=None) -> Tensor\n\nConcatenates a sequence of tensors along a new dimension.\n\nAll tensors need to be of the same size.\n\n.. seealso::\n\n    :func:`torch.cat` concatenates the given sequence along an existing dimension.\n\nArguments:\n    tensors (sequence of Tensors): sequence of tensors to concatenate\n    dim (int): dimension to insert. Has to be between 0 and the number\n        of dimensions of concatenated tensors (inclusive)\n\nKeyword args:\n    out (Tensor, optional): the output tensor.",
+    "imports": [
+        "import torch"
+    ],
+    "return_type_hint": "-> Tensor",
+    "source_code": null,
+    "summarized_doc": "The `stack` function in the PyTorch library concatenates a sequence of tensors along a new dimension. This function requires that all tensors are the same size. \n\nIt has two main parameters:\n1. `tensors` : This is a sequence of tensors that you want to concatenate. This is an obligatory parameter, meaning the function cannot work without it.\n2. `dim` : This is an integer representing the dimension to insert. The range for this is between 0 and the number of dimensions of concatenated tensors, inclusive of these end points. This parameter is also obligatory.\n\nThere is also a keyword parameter, `out`, which an optional parameter for the output tensor. \n\nThis function returns a tensor.\n\nIf you're interested in concatenating a given sequence along an existing dimension, see also the function `torch.cat`."
+}

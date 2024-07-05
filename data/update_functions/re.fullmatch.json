@@ -1,0 +1,11 @@
+{
+    "api_path": "re.fullmatch",
+    "arguments_str": "pattern,string,flags=0",
+    "doc_string": "Try to apply the pattern to all of the string, returning\na Match object, or None if no match was found.",
+    "imports": [
+        "import re"
+    ],
+    "return_type_hint": "",
+    "source_code": "def fullmatch(pattern, string, flags=0):\n    \"\"\"Try to apply the pattern to all of the string, returning\n    a Match object, or None if no match was found.\"\"\"\n    return _compile(pattern, flags).fullmatch(string)\n",
+    "summarized_doc": "Function: `re.match(pattern, string, flags=0)`\n\nDescription:\nThe `re.match` function attempts to match the provided `pattern` to the `string` entirely, starting from the beginning of the `string`. The function will either return a Match object if a match is found or it will return `None` if no match was found.\n\nInput Parameters:\n\n1. `pattern` (string): The regular expression pattern that you want to match.\n2. `string` (string): The string where you want to apply the pattern.\n3. `flags` (integer, optional): You can specify different flags using bitwise OR (`|`). It is zero by default. These are the modifier which are very useful to handle different types of scenarios.\n\nOutput:\nThe function will result in either of the following:\n\n1. A Match object, which contains information about the match, including the original input string, the regular expression that was used, and the location within the original string where the match was found.\n\n2. `None`, if no match was found.\n\nIllustrative code:\n```python\nimport re \n\npattern = \"[a-zA-Z0-9]+\"\ntext = \"Example text123\"\n\nresult = re.match(pattern, text)\n\nif result:\n    print(\"Match found!\")\n    print(\"Matched string:\", result.group())\nelse:\n    print(\"No match found.\")\n```"
+}

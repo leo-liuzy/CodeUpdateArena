@@ -1,0 +1,11 @@
+{
+    "api_path": "math.cos",
+    "arguments_str": "x,/",
+    "doc_string": "Return the cosine of x (measured in radians).",
+    "imports": [
+        "import math"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function: math.cos(x)\n\nDescription:\nThe `math.cos(x)` function in Python returns the cosine of x, where x is measured in radians. \n\nParameters:\n- x (float): A number representing an angle in radians.\n\nReturns:\n- float: The Cosine of x.\n\nExample Usage:\n\n```python\nimport math\nx = math.radians(45) # converting degrees to radians\nresult = math.cos(x) # cosine of 45 degrees\nprint(result) # it will output: 0.7071067811865476\n```\n\nNote: It is important to remember that the input needs to be in radians, not degrees. To convert from degrees to radians, you can use the `math.radians()` function. The value returned will be in the range [-1, 1]."
+}

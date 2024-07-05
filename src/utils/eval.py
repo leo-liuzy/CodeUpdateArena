@@ -18,9 +18,9 @@ from torch.utils.data import DataLoader
 from datasets import load_dataset
 
 from src.execution.safe_execution_util import execute
-from src.experiments.ft_model import FinetunedModel, FinetunedCodeLlama
+from src.models.ft_model import FinetunedModel, FinetunedCodeLlama
 from src.utils.code import concat_and_exec
-from src.utils.prompt_tool import CodeGenTemplate, InstructTemplate
+from src.utils.prompt import CodeGenTemplate, InstructTemplate
 
 
 def pass_at_k(n: int, c: int, k: int):

@@ -1,0 +1,11 @@
+{
+    "api_path": "torch.unsqueeze",
+    "arguments_str": "input,dim",
+    "doc_string": "unsqueeze(input, dim) -> Tensor\n\nReturns a new tensor with a dimension of size one inserted at the\nspecified position.\n\nThe returned tensor shares the same underlying data with this tensor.\n\nA :attr:`dim` value within the range ``[-input.dim() - 1, input.dim() + 1)``\ncan be used. Negative :attr:`dim` will correspond to :meth:`unsqueeze`\napplied at :attr:`dim` = ``dim + input.dim() + 1``.\n\nArgs:\n    input (Tensor): the input tensor.\n    dim (int): the index at which to insert the singleton dimension\n\nExample::\n\n    >>> x = torch.tensor([1, 2, 3, 4])\n    >>> torch.unsqueeze(x, 0)\n    tensor([[ 1,  2,  3,  4]])\n    >>> torch.unsqueeze(x, 1)\n    tensor([[ 1],\n            [ 2],\n            [ 3],\n            [ 4]])",
+    "imports": [
+        "import torch"
+    ],
+    "return_type_hint": "-> Tensor",
+    "source_code": null,
+    "summarized_doc": "Function:\nunsqueeze(input, dim) -> Tensor\n\nDescription:\nThis function returns a new tensor with a dimension of size one inserted at the specified position. The returned tensor shares the same underlying data with the input tensor.\n\nArguments:\n\n1. input (Tensor): This is the input tensor to which we wish to add an additional dimension. \n\n2. dim (int): It identifies the index at which we need to insert the singleton dimension. You can specify this value within the range [-input.dim() - 1, input.dim() + 1). Using a negative value for `dim` is equivalent to calling unsqueeze at `dim = dim + input.dim() + 1`.\n\nOutput:\nReturns a tensor with an additional dimension of size one.\n\nExample:\n\n    >>> x = torch.tensor([1, 2, 3, 4])\n    >>> torch.unsqueeze(x, 0)\n    tensor([[ 1,  2,  3,  4]])\n    >>> torch.unsqueeze(x, 1)\n    tensor([[ 1],\n           [ 2],\n           [ 3],\n           [ 4]])"
+}

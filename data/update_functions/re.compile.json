@@ -1,0 +1,11 @@
+{
+    "api_path": "re.compile",
+    "arguments_str": "pattern,flags=0",
+    "doc_string": "Compile a regular expression pattern, returning a Pattern object.",
+    "imports": [
+        "import re"
+    ],
+    "return_type_hint": "",
+    "source_code": "def compile(pattern, flags=0):\n    \"Compile a regular expression pattern, returning a Pattern object.\"\n    return _compile(pattern, flags)\n",
+    "summarized_doc": "Function: re.compile(pattern, flags=0)\n\nDescription: This function in the 're' module of Python Library compiles a regular expression pattern into a Pattern object, which can be used for matching using its match() and search() methods, among others. The 're' module offers functions that are easier to understand and debug than using regular expressions directly.\n\nInput Parameters:\n1. pattern: This is the regular expression to be compiled. It is a string.\n\n2. flags (Optional): This is a bitwise OR of several parameters. It controls the regular expression's behavior. Default is 0. Some flags include:\n    - re.I or re.IGNORECASE: Makes the pattern case-insensitive.\n    - re.M or re.MULTILINE: Multi-line matching, affecting '^' and '$'.\n    - re.S or re.DOTALL: Make the '.' special character match any character at all, including a newline; Without this flag, '.' will match anything except a newline.\n    - re.X or re.VERBOSE: This flag allows you to write regular expressions that look nicer and are more readable by allowing you to visually separate logical sections of the pattern and add comments.\n\nOutput: Returns a Pattern object.\n\nExample:\n```python\n  import re\n  pattern = re.compile(\"[a-z]+\")  # Compile a pattern that matches one or more lowercase letters\n  print(pattern.match(\"hello\"))  # Try to match the pattern at the start of the string\n```\nThis will print: `<re.Match object; span=(0, 5), match='hello'>`. \nIt indicates that a match was found at the start of the input string, and it captured the substring 'hello'. If no match was found at the start of the string, then `None` is returned."
+}

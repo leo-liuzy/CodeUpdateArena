@@ -1,0 +1,11 @@
+{
+    "api_path": "itertools.chain",
+    "arguments_str": "*iterables",
+    "doc_string": "chain(*iterables) --> chain object\n\nReturn a chain object whose .__next__() method returns elements from the\nfirst iterable until it is exhausted, then elements from the next\niterable, until all of the iterables are exhausted.",
+    "imports": [
+        "import itertools"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function: chain(*iterables)\nReturn type: chain object\n\nThis function returns a chain object. It implements the iterator protocol with a method called .__next__(). When the .__next__() method is called, it sequentially returns elements from the very first iterable in the given list of iterables.\n\nWhen the first iterable is exhausted, it moves on to the next iterable. It continues in this manner, moving across iterable to iterable, until all given iterables are exhausted.\n\nParameters: \n*iterables: These are any number of iterables (like list, tuple, dict, etc.) that you want to chain together. It must be noted that these iterables are exhausted in the order they are presented. \n\nExample Usage:\n```\nfrom itertools import chain\ncombined = chain([1, 2, 3], ['a', 'b', 'c'])\nprint(list(combined))\n```\nOutput:\n```\n[1, 2, 3, 'a', 'b', 'c']\n```\n\nIn the above code, we chained a list of integers [1,2,3] and a list of characters ['a','b','c']. As you can see, the elements are returned in the order they occur (first iterable to last)."
+}

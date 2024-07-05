@@ -1,0 +1,11 @@
+{
+    "api_path": "itertools.islice",
+    "arguments_str": "iterable,start,stop[,step]",
+    "doc_string": "islice(iterable, stop) --> islice object\nislice(iterable, start, stop[, step]) --> islice object\n\nReturn an iterator whose next() method returns selected values from an\niterable.  If start is specified, will skip all preceding elements;\notherwise, start defaults to zero.  Step defaults to one.  If\nspecified as another value, step determines how many values are\nskipped between successive calls.  Works like a slice() on a list\nbut returns an iterator.",
+    "imports": [
+        "import itertools"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function: islice()\n\nThe islice() function from Python's itertools module returns an iterator that generates selected values from an iterable.\n\nParameters:\n1. iterable: Any iterable object like list, tuple, string, etc.\n2. start: (Optional) Point where the slicing of iterable starts.\n   - Default value is 0. If the start is specified, the function will bypass all preceding elements.\n3. stop: The point where the slicing of iterable stops. This is a required parameter.\n4. step: (Optional) Determines the step or skip value between the elements.\n   - Default value is 1. If the step is specified as another value, it determines how many values are skipped between successive calls.\n\nReturn:\n- The function returns an islice object which is an iterator.\n\nThe function is similar to a slicing operation on a list but instead of returning a list, it returns an iterator.\n\nExample usage:\n```python\nfrom itertools import islice\n\niterableObj = ['a', 'b', 'c', 'd', 'e', 'f', 'g']\nstart = 2\nstop = 5\nstep = 2\n\nslicedIterator = islice(iterableObj, start, stop, step)\nfor value in slicedIterator:\n     print(value)\n```\nIn this example, 'c' and 'e' would be printed as output."
+}

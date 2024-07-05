@@ -13,8 +13,15 @@ from typing import List, Callable
 from loguru import logger
 from collections import defaultdict
 
-from src.data.manager_update import UpdateManager
-from src.data.manager_prog_syn import ProgSynManager
+from src.data.manager_update import UpdateManagerV2, UpdateManagerV21
+from src.data.manager_prog_syn import ProgSynManagerV2
+
+from src.models.prepend_model import PrependModel, PrependCodeLlama, PrependGPT4
+
+from src.utils.prompt import CodeGenTemplate, InstructTemplate
+from src.utils.cache import SQLiteCache
+from src.utils.eval_utils import pass_at_k
+from src.utils.args import set_random_seed
 from src.utils.update import UpdatedFunction
 from src.utils.code import (
     Function,
@@ -24,23 +31,12 @@ from src.utils.code import (
     wrap_code_in_short_comment,
     UnitTestsReport
 )
-from src.utils.prompt import CodeGenTemplate, InstructTemplate
-from src.experiments.prepend_model import PrependModel, PrependCodeLlama, PrependGPT4
-from src.utils.io_utils import SQLiteCache
-from src.utils.eval import pass_at_k
-from src.utils.utils import set_random_seed
 
 U_FILE_NAME = "update-content-w_ut.json"
 PS_FILE_NAME = "prog_syn-content-w_ut.json"
 proj_root = os.path.dirname(__file__) + "/../.."
 U_ROOT = f"{proj_root}/data/prelim/CodeUpdateArena-pre-PS"
 pilot_root_dir = f"{proj_root}/data/prelim/pilot_run/gpt-4"
-
-def trim_unit_tests(content_dict):
-    unit_tests_pass_w_update = content_dict["unit_tests_pass_w_update"]
-    unit_tests = content_dict["unit_tests"]
-    trimmed_unit_tests = [unit_tests[int(idx)] for idx, pass_w_update in unit_tests_pass_w_update.items() if pass_w_update]
-    return trimmed_unit_tests
 
 
 def prepare_arena_dataset(cfg: DictConfig):    
@@ -105,7 +101,7 @@ class TestBed:
     @classmethod
     def check_unit_tests(
         cls,
-        update_manager: UpdateManager,
+        update_manager: UpdateManagerV2,
         imports: List[str],
         unit_tests: List[Function],
         tested_function: Function,
@@ -364,6 +360,9 @@ class OneShotTestBed(TestBed):
         cache_prefix = self.cache_prefix
         if len(cache_prefix) > 0:
             cache_prefix = f"{cache_prefix}_"
+        logger.info(f"cache file:  {self.proj_root}/caches/{cache_prefix}one_shot_test_bed"\
+                f"#pub-ut={self.num_public_unit_tests}_model={model.model_name}.sqlite"
+        )
         self.cache = SQLiteCache(
             f"{self.proj_root}/caches/{cache_prefix}one_shot_test_bed"\
                 f"#pub-ut={self.num_public_unit_tests}_model={model.model_name}.sqlite"
@@ -407,6 +406,7 @@ class OneShotTestBed(TestBed):
             test_prompt = self.prepare_prompt(test_datum)
             open(f"{save_dir}/prompt.txt", "w").write(test_prompt)
             generated_solutions = self.cached_query_func(prompt=test_prompt)
+            assert len(generated_solutions) == self.cfg.evaluation.n_decoding_example
             json.dump(generated_solutions, open(f"{save_dir}/generated_texts.json", "w"))
         
     def execute_arena(self, save_root, model_name):
@@ -427,7 +427,7 @@ class OneShotTestBed(TestBed):
             ):
                 continue
             
-            u_manager = UpdateManager(
+            u_manager = UpdateManagerV21(
                 cfg=self.update_cfg, 
                 api_path=test_datum["update"]["api_path"], 
                 update_tag=test_datum["update"]["update_type"]
@@ -446,7 +446,7 @@ class OneShotTestBed(TestBed):
                 test_reports.append(test_report.output)
             pickle.dump(test_reports, open(f"{save_dir}/test_reports.pkl", "wb"))
             
-            eval_result = self.aggregate_test_reports(test_reports)
+            eval_result = self.aggregate_test_reports(u_manager, test_reports, generated_programs)
             eval_result["api_path"] = test_datum["update"]["api_path"]
             eval_result["update_type"] = test_datum["update"]["update_type"]
             eval_result["package"] = test_datum["package"]
@@ -455,36 +455,91 @@ class OneShotTestBed(TestBed):
             json.dump(eval_result, open(f"{save_dir}/eval_result.json", "w"))
             
     
+    def evaluate(self, model: PrependModel) -> pd.DataFrame:
+        
+        self._create_cache(model)
+        
+        eval_results = []
+        grouped_eval_results = defaultdict(list)
+        for test_datum in tqdm(self.test_dataset):
+            test_prompt = self.prepare_prompt(test_datum)
+            # start = time()
+            generated_solutions = self.cached_query_func(prompt=test_prompt)
+            # print(f"Generation time(s): {time() - start}s")
+            # extract solution code
+            generated_programs = list(map(self.prompt_template.solution_extractor, generated_solutions))
+            # create update manager
+            u_manager = UpdateManagerV21(
+                cfg=self.update_cfg, 
+                api_path=test_datum["update"]["api_path"], 
+                update_tag=test_datum["update"]["update_type"]
+            )
+            u_manager.load_from_dict(test_datum["update"])
+            
+            unit_test_functions = [Function(unit_test) for unit_test in test_datum["prog_syn"]["unit_tests"]]
+            test_reports = []
+            start = time()
+            # Execute each generated program
+            for generated_program in generated_programs:
+                # assert generated_program, "Failed to extract generated_program"
+                test_report = self.cached_exec_func(
+                    update_manager=u_manager, 
+                    imports=test_datum["prog_syn"]["imports"], 
+                    unit_tests=unit_test_functions, 
+                    tested_function=generated_program,
+                )
+                test_reports.append(test_report.output)
+            # print(f"Execution time(s): {time() - start}s")
+            individual_eval_results = self.aggregate_test_reports(u_manager, test_reports, generated_programs)
+            api_path = test_datum["update"]["api_path"]
+            update_type = test_datum["update"]["update_type"]
+            update_id = test_datum["update"]["identifier"]
+            
+            individual_eval_results["api_path"] = api_path
+            individual_eval_results["update_type"] = update_type
+            individual_eval_results["update_id"] = update_id
+            individual_eval_results["identifier"] = test_datum["identifier"]
+            eval_results.append(individual_eval_results)
+            grouped_eval_results[f"{api_path}/{update_type}/{update_id}"].append(individual_eval_results)
+        
+        df = pd.DataFrame(eval_results)
+        grouped_df = {k: pd.DataFrame(vs) for k, vs in grouped_eval_results.items()}
+        return df, grouped_df
+    
 def generate_text(cfg):
     test_bed = OneShotTestBed(cfg, cache_prefix="neurips_base")
+    # test_bed = OneShotTestBed(cfg, cache_prefix="neurips")
     prepend_model = PrependCodeLlama(cfg)
     # prepend_model = PrependGPT4(cfg)
     proj_root = os.path.dirname(__file__) + "/../.."
     # df, grouped_df = test_bed.evaluate(prepend_model)
-    # test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/evaluate_base/FT-0_n={cfg.evaluation.n_decoding_example}_lr=0.001_noUpdate")
-    test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/evaluate_base/prepend_n={cfg.evaluation.n_decoding_example}")
+    # test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/evaluate_base/prepend_n={cfg.evaluation.n_decoding_example}_noUpdate")
+    # test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/prepend_n={cfg.evaluation.n_decoding_example}")
     
+    # test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/evaluate_base/debug_prepend")
     
 def run_exec(cfg):
     test_bed = OneShotTestBed(cfg, cache_prefix="neurips_base")
+    # test_bed = OneShotTestBed(cfg, cache_prefix="neurips")
     # model_name = "CodeLlama-7b-Instruct-hf"
     # model_name = "deepseek-coder-7b-instruct-v1.5"
-    # model_name = "deepseek-coder-6.7b-instruct"
-    model_name = "gpt-4"
+    model_name = "deepseek-coder-6.7b-instruct"
+    # model_name = "gpt-4"
     
     test_bed.execute_arena(
         # save_root=f"{proj_root}/evaluation_output/prepend_n={cfg.evaluation.n_decoding_example}",
-        save_root=f"{proj_root}/evaluation_output_final/evaluate_base/FT-0_n={cfg.evaluation.n_decoding_example}_lr=0.001_noUpdate",
+        # save_root=f"{proj_root}/evaluation_output_final/evaluate_base/FT-0_n={cfg.evaluation.n_decoding_example}_lr=0.001_noUpdate",
+        save_root=f"{proj_root}/evaluation_output_final/evaluate_base/prepend_n={cfg.evaluation.n_decoding_example}_noUpdate",
         model_name=model_name
     )
     
-@hydra.main(version_base=None , config_path="../../configs", config_name="base.yaml")
+@hydra.main(version_base=None , config_path="../../configs", config_name="base_tool_neurips.yaml")
 def main(
     cfg
 ):
     
     generate_text(cfg)
-    run_exec(cfg)
+    # run_exec(cfg)
     print()
     
 if __name__ == "__main__":

@@ -1,0 +1,11 @@
+{
+    "api_path": "re.match",
+    "arguments_str": "pattern,string,flags=0",
+    "doc_string": "Try to apply the pattern at the start of the string, returning\na Match object, or None if no match was found.",
+    "imports": [
+        "import re"
+    ],
+    "return_type_hint": "",
+    "source_code": "def match(pattern, string, flags=0):\n    \"\"\"Try to apply the pattern at the start of the string, returning\n    a Match object, or None if no match was found.\"\"\"\n    return _compile(pattern, flags).match(string)\n",
+    "summarized_doc": "**Function**: re.match(pattern, string, flags=0)\n\n**Description**: This function attempts to match the given pattern to the start of a given string. If the match is successful, a Match object is returned. If no match is found, the function returns None.\n\n**Input Parameters**: \n\n1. **pattern**: Required. The regular expression pattern that you want to match. This should be a string.\n   \n2. **string**: Required. The string in which to search. This is the text where the regular expression is searched.\n   \n3. **flags**: Optional. It can be any combination of the following:\n    - **re.IGNORECASE**: This flag allows for case-insensitive matching.\n    - **re.MULTILINE**: Specifies that the pattern character '^' matches at the start of the string and at the start of each line.\n    - **re.DOTALL**: Specifies that the pattern character '.' matches any character including newlines.\n\n**Output**: \n\nA Match object if the pattern is found at the start of the 'string'. Otherwise, None.\n\n**Example Usage**:\n\n```python\nimport re\n\nstring = \"Python programming is fun\"\npattern = \"^Python\"\n\nmatch_obj = re.match(pattern, string)\n\nif match_obj:\n   print(\"Match found!\")\nelse:\n   print(\"No match found.\")\n```\n\nIn the above example, `re.match()` will return a Match object because the string starts with the word \"Python\". If the 'pattern' was something else that the 'string' doesn't start with, `re.match()` would return None."
+}

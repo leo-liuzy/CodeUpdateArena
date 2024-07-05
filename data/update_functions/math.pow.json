@@ -1,0 +1,11 @@
+{
+    "api_path": "math.pow",
+    "arguments_str": "x,y,/",
+    "doc_string": "Return x**y (x to the power of y).",
+    "imports": [
+        "import math"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "**Function**: pow(x, y)\n\n**Description**: This function returns the value of x raised to the power of y.\n\n**Input Parameters**:\n1. `x`: A number (int or float) -- The base of the power calculation.\n2. `y`: A number (int or float) -- The exponent in the power operation.\n\n**Output**: Returns the result as a number.\n\n**Example Usage**:\n\n```python\nresult = pow(2, 3)\nprint(result)  # Outputs: 8\n```\n\nIn this example, the function `pow()` is used to calculate the value of 2 raised to the power of 3, which results in 8."
+}

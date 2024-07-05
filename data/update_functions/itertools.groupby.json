@@ -1,0 +1,11 @@
+{
+    "api_path": "itertools.groupby",
+    "arguments_str": "iterable,key=None",
+    "doc_string": "make an iterator that returns consecutive keys and groups from the iterable\n\niterable\n  Elements to divide into groups according to the key function.\nkey\n  A function for computing the group category for each element.\n  If the key function is not specified or is None, the element itself\n  is used for grouping.",
+    "imports": [
+        "import itertools"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "This function creates an iterator that partitions an iterable into groups based on a specified key function and consecutively returns the key and a group of items.\n\nParameters:\n\n1. iterable: This input is the iterable object (like a list, tuple, etc.) that you want to divide into groups. Each element in this iterable is examined and categorized into groups based on the key function.\n\n2. key (Function, Optional): This is a function which computes the group category for each element in the iterable. It takes an element from the iterable as an input and returns the category as an output. If no key function is specified or if it is set to None, then the element itself is used for grouping. This means items will be grouped based on their value if no key function is provided.\n\nOutput:\n\nThe function returns an iterator that yields tuples. Each tuple contains a key and a group, where the key is the category computed by the key function and the group is an iterable of all items in the same category.\n\nExample usage:\n\n```python\nfrom itertools import groupby\n\n# define the key function\ndef key_func(x):\n  return x % 2\n\n# define the iterable\nitems = [1, 2, 3, 4, 5, 6]\n\n# Call the function\nresult = groupby(items, key_func)\n\n# Print the result\nfor key, group in result:\n    print(key, list(group))\n```\n\nThis will divide the items into two groups based on whether they are even or odd, and print the key (0 for even, 1 for odd) followed by the list of items in that group."
+}

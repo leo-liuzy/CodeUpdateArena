@@ -10,7 +10,7 @@ model:
   model_name_or_path: # hf model id or path to model
 
 data:
-  data_dir: # hf dataset id or path to data
+  data_dir: leo-liuzy/CodeUpdateArena
 
 output_dir:
 

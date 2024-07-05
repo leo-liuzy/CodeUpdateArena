@@ -1,0 +1,11 @@
+{
+    "api_path": "re.search",
+    "arguments_str": "pattern,string,flags=0",
+    "doc_string": "Scan through string looking for a match to the pattern, returning\na Match object, or None if no match was found.",
+    "imports": [
+        "import re"
+    ],
+    "return_type_hint": "",
+    "source_code": "def search(pattern, string, flags=0):\n    \"\"\"Scan through string looking for a match to the pattern, returning\n    a Match object, or None if no match was found.\"\"\"\n    return _compile(pattern, flags).search(string)\n",
+    "summarized_doc": "Function: `search()`\n\nDescription:\nThe `search()` function scans through a string, looking for any location where the specified regular expression pattern matches. If the pattern matches, it returns a `match` object which contains information about the matching part. If the pattern does not match, it returns `None`.\n\nInput Parameters:\n1. `pattern` (type: string or pattern object): This is the regular expression pattern that we are trying to find in the string.\n2. `string` (type: string): This is the string in which we are trying to find the pattern. \n3. `flags` (type: int, optional): This is a set of flags to modify the behavior of the search. It is optional and if not provided, defaults to 0.\n\nOutput:\n\nThe function returns a `match` object if the pattern is found in the string. If the pattern does not match, it returns `None`.\n\nNotes:\n\nThe `match` object has methods and attributes such as:\n- `group()`: Returns one or more subgroups of the match.\n- `start()`: Returns the starting position of the match.\n- `end()`: Returns the ending position of the match.\n- `span()`: Returns a tuple containing the start-and-end positions of the match.\n\nHere's an illustrative code:\n\n```python\nimport re\nline = \"Cats are smarter than dogs\"\nmatchObj = re.search( r'dogs', line, re.M|re.I)\n\nif matchObj:\n   print \"search --> searchObj.group() : \", matchObj.group()\nelse:\n   print \"Nothing found!!\"\n```\n\nIn this example, we use the `search()` function to find the substring 'dogs' in the string. If the string contains the substring 'dogs', a `match` object will be returned and the if condition will be true. If the string does not contain 'dogs', `None` will be returned and the \"Nothing found!!\" message will be printed."
+}

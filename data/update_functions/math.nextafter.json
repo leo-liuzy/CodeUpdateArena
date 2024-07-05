@@ -1,0 +1,11 @@
+{
+    "api_path": "math.nextafter",
+    "arguments_str": "x,y,/",
+    "doc_string": "Return the next floating-point value after x towards y.",
+    "imports": [
+        "import math"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function Name: nextafter()\n\nDescription: \nThe function `nextafter(x, y)` returns the next representable floating-point value after 'x' towards 'y'. If 'x' equals 'y', it returns 'y'. Otherwise, it precisely determines the next float point value in the direction towards 'y'. \n\nParameters: \n\n1. `x`: A float value. It indicates the starting point from where the next floating-point value needs to be calculated.\n2. `y`: A float value. It represents the direction towards which the 'x' has to move to find the next floating-point value.\n\nReturn: \nThis function returns a float value, which is the next representable floating-point value after 'x' towards 'y'.\n\nCode Example: \n\n```python\nimport numpy as np\n\n# prints: 1.0\nprint(np.nextafter(1, 2)) \n\n# prints: 0.9999999999999999\nprint(np.nextafter(1, 0))\n```\n\nNote: The python library 'numpy' is required for this function. Run `pip install numpy` if you haven't already installed it."
+}

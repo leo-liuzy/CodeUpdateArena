@@ -1,0 +1,11 @@
+{
+    "api_path": "re.finditer",
+    "arguments_str": "pattern,string,flags=0",
+    "doc_string": "Return an iterator over all non-overlapping matches in the\nstring.  For each match, the iterator returns a Match object.\n\nEmpty matches are included in the result.",
+    "imports": [
+        "import re"
+    ],
+    "return_type_hint": "",
+    "source_code": "def finditer(pattern, string, flags=0):\n    \"\"\"Return an iterator over all non-overlapping matches in the\n    string.  For each match, the iterator returns a Match object.\n\n    Empty matches are included in the result.\"\"\"\n    return _compile(pattern, flags).finditer(string)\n",
+    "summarized_doc": "Functionality: This function returns an iterator for all non-overlapping matches in a provided string. Every match is returned as a Match object. Noteworthy, even empty matches are included in the result.\n\nInput Parameters: The function accepts a single input, which is the string to be searched for matches.\n\nOutput: The function's output is an iterator. Each iteration will yield a Match object for each non-overlapping match found in the input string.\n\n```python\nimport re\n\ndef find_matches(pattern, string):\n    return re.finditer(pattern, string)\n\nfor match in find_matches(\"<pattern>\", \"<input_string>\"):\n    print(match)\n```\nIn the above sample code, replace `<pattern>` with your search pattern and `<input_string>` with the string you want to search within. The function `find_matches` will return an iterator over all non-overlapping matches of the pattern in the input string. Each match is printed out.\n\nNote: The function does not ignore empty matches. If the pattern matches an empty string, such matches will be included in the result."
+}

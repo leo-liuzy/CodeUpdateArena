@@ -1,0 +1,11 @@
+{
+    "api_path": "re.findall",
+    "arguments_str": "pattern,string,flags=0",
+    "doc_string": "Return a list of all non-overlapping matches in the string.\n\nIf one or more capturing groups are present in the pattern, return\na list of groups; this will be a list of tuples if the pattern\nhas more than one group.\n\nEmpty matches are included in the result.",
+    "imports": [
+        "import re"
+    ],
+    "return_type_hint": "",
+    "source_code": "def findall(pattern, string, flags=0):\n    \"\"\"Return a list of all non-overlapping matches in the string.\n\n    If one or more capturing groups are present in the pattern, return\n    a list of groups; this will be a list of tuples if the pattern\n    has more than one group.\n\n    Empty matches are included in the result.\"\"\"\n    return _compile(pattern, flags).findall(string)\n",
+    "summarized_doc": "Function: findall()\n\nDescription: The findall() function in Python is used to find all non-overlapping matches of a pattern in a string. The function returns a list of all matches found. If one or more capturing groups are in the pattern, the function returns a list of groups, which will be a list of tuples if the pattern has more than one group. Empty matches are included in the result.\n\nInput Parameters:\n\n1. pattern (str): The regular expression pattern that you want to find in the target string.\n\n2. string (str): The string where you want to find the pattern.\n\nOutput: This function returns a list of all non-overlapping matches. If there are groups in the pattern, then a list of groups (tuples if more than one group) is returned. \n\nIllustrative Python Code:\n```python\nimport re\n\n#Here \"a\" is the pattern and \"abcabcabc\" is the string.\nmatches = re.findall(\"a\", \"abcabcabc\")\n\nprint(matches)\n```\nIn this example, the output will be `['a', 'a', 'a']` as the pattern \"a\" is found 3 times in the provided string."
+}

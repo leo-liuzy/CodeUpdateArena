@@ -12,7 +12,7 @@ model:
   model_name_or_path: # hf model id or path to model
 
 data:
-  data_dir: # hf dataset id or path to data
+  data_dir: leo-liuzy/CodeUpdateArena
   training_example_per_update: 0
 
 output_dir: tmp/chkpt_null

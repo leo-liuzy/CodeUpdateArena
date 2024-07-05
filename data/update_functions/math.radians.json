@@ -1,0 +1,11 @@
+{
+    "api_path": "math.radians",
+    "arguments_str": "x,/",
+    "doc_string": "Convert angle x from degrees to radians.",
+    "imports": [
+        "import math"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function: math.radians(x)\n\nDescription:\nThis function converts angle x from degrees to radians.\n\nInput Parameter:\nx: The angle in degrees. This can be any real number (int, float).\n\nOutput: \nThe returned output is the angle converted to radians, and it is of floating-point number.\n\nIllustrative code:\n```python\nimport math\ndegrees = 180\nradians = math.radians(degrees)\nprint(radians)  # Outputs: 3.141592653589793\n```\n\nNote:\nRadians are a unit of measurement for angles, just like degrees are. Most mathematical functions in the Python math module use radians."
+}

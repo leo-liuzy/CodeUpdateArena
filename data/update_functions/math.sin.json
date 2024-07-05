@@ -1,0 +1,11 @@
+{
+    "api_path": "math.sin",
+    "arguments_str": "x,/",
+    "doc_string": "Return the sine of x (measured in radians).",
+    "imports": [
+        "import math"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Function: `sin(x)`\n\nDescription: This function returns the sine of `x`, where `x` is measured in radians.\n\nInput parameter: `x` (required) - a real number representing an angle in radians.\n\nOutput: The function returns a real number that represents the sine of `x`. The result is in the range of -1 to 1.\n\nSample code:\n```Python\nimport math\nprint(math.sin(math.pi/2))  \n# output: 1.0 (since sin(\u03c0/2) is 1)\n```\nThis function is part of the math module in Python, so you'll need to import the math module to use the `sin` function. Here, `math.pi` is a constant that represents the mathematical constant \u03c0 (pi), roughly equal to 3.14159. Thus `math.pi/2` equates to \u03c0/2, or 90 degrees.\n\nNote: This function might produce a different result if the input value is not a number (like a complex number), or outside the range of valid input values for the sine function (i.e., outside the set of real numbers)."
+}

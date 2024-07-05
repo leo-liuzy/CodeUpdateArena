@@ -8,7 +8,7 @@ from omegaconf import OmegaConf
 import pickle
 import numpy as np
 
-from data.manager_update import Manager, UpdateManager
+from src.data.manager_update import Manager, UpdateManager
 from src.utils.update import Action, Aspect, Place, UpdatedFunction, UpdateType
 from src.utils.code import (
     CheckErrorType, CheckOutput,

@@ -1,0 +1,11 @@
+{
+    "api_path": "math.hypot",
+    "arguments_str": "*coordinates",
+    "doc_string": "hypot(*coordinates) -> value\n\nMultidimensional Euclidean distance from the origin to a point.\n\nRoughly equivalent to:\n    sqrt(sum(x**2 for x in coordinates))\n\nFor a two dimensional point (x, y), gives the hypotenuse\nusing the Pythagorean theorem:  sqrt(x*x + y*y).\n\nFor example, the hypotenuse of a 3/4/5 right triangle is:\n\n    >>> hypot(3.0, 4.0)\n    5.0",
+    "imports": [
+        "import math"
+    ],
+    "return_type_hint": "-> value",
+    "source_code": null,
+    "summarized_doc": "Function: `hypot(*coordinates) -> value`\n\nDescription: This function calculates the multidimensional Euclidean distance from the origin to a point. In simpler terms, it calculates the direct straight-line distance between two points in a space. This is also known as the hypotenuse of a right triangle in a two-dimensional space, computed using the Pythagorean theorem.\n\nParameters: \n- `*coordinates` - Any number (n) of input coordinates. Each coordinate contributes a dimension to the space in which the distance is being calculated. These are real numbers (float or integers).\n\nOutput: The function returns a `value` which is the computed Euclidean distance. This value is a real number (float).\n\nUsage:\nThis function can be used with two-dimensional points (x, y), for example:\n  \n```python\n>>> hypot(3.0, 4.0)\n5.0\n```\nIn this example, `3.0` is the `x` coordinate and `4.0` is the `y` coordinate of a point in 2D space. The function computes the distance from the point `(0, 0)` to the point `(3.0, 4.0)` using the formula `sqrt(x*x + y*y)` and returns the results `5.0` which is the hypotenuse of a 3/4/5 right triangle."
+}

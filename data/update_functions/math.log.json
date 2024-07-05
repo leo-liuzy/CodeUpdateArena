@@ -1,0 +1,11 @@
+{
+    "api_path": "math.log",
+    "arguments_str": "x,[base=math.e]",
+    "doc_string": "log(x, [base=math.e])\nReturn the logarithm of x to the given base.\n\nIf the base not specified, returns the natural logarithm (base e) of x.",
+    "imports": [
+        "import math"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "Functionality:\nThe `log(x, [base=math.e])` function computes the logarithm of a number 'x' with respect to a specified base. By default, if no base is provided, the function calculates the natural logarithm (base 'e') of 'x'.\n\nInput Parameters:\n1. `x` (required): The number whose logarithm is to be calculated. This must be a positive number.\n2. `base` (optional): The base of the logarithm. If not specified, the base defaults to the mathematical constant 'e' (approximately 2.71828).\n\nOutput: \nThe function returns the logarithm of 'x' to the specified base. If the base is not given, it returns the natural logarithm of 'x'.\n\nIllustrative code:\n\n```python\nimport math \n\n# Calculating the natural logarithm\nprint(math.log(10))  # Outputs: 2.302585092994046\n\n# Logarithm base 2\nprint(math.log(10, 2))  # Outputs: 3.321928094887362\n```"
+}

@@ -1,0 +1,11 @@
+{
+    "api_path": "itertools.compress",
+    "arguments_str": "data,selectors",
+    "doc_string": "Return data elements corresponding to true selector elements.\n\nForms a shorter iterator from selected data elements using the selectors to\nchoose the data elements.",
+    "imports": [
+        "import itertools"
+    ],
+    "return_type_hint": "",
+    "source_code": null,
+    "summarized_doc": "**Function**: `compress(data, selectors)`\n\n**Module**: `itertools` \n\nThe function `compress()` from the `itertools` library in Python is used to selectively pick the values from the data iterable based on the boolean value at the corresponding place in the selector iterable. \n\n**Parameters**:\n1. `data` : An iterable object where you want to pick elements.\n    - Expected datatype: Iterable\n2. `selectors` : An iterable object that matches the length of the data object. It should contain boolean values (True / False) for choosing corresponding data elements.\n    - Expected datatype: Iterable\n\n**Returns**: \n- An iterator that generates the elements of `data` for which the corresponding element in `selectors` is `True`.\n\n**Example Usage**:\n\n```python\nfrom itertools import compress\ndata = ['A', 'B', 'C', 'D', 'E']\nselectors = [True, False, True, False, True]\nresult = compress(data, selectors)\nprint(list(result))  # Outputs: ['A', 'C', 'E']\n```\n\nIn the above example, the function picks the elements 'A', 'C', 'E' from the data list as the corresponding values in the selectors list are True."
+}

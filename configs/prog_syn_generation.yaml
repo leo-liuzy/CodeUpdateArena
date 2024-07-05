@@ -1,0 +1,15 @@
+default:
+  max_rej_sample: 3
+prog_syn_spec:
+  max_rej_sample: ${default.max_rej_sample}
+unit_test_skeletons:
+  max_rej_sample: ${default.max_rej_sample}
+  num_unit_tests: 10
+unit_test_answer:
+  max_rej_sample: ${default.max_rej_sample}
+solution_new:
+  max_rej_sample: 3
+  threshold: 0.7
+  include_unit_tests: True
+imports: 
+  max_rej_sample: ${default.max_rej_sample}
