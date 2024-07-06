@@ -14,6 +14,8 @@ from hydra.core.hydra_config import HydraConfig
 from typing import List, Callable
 from loguru import logger
 from collections import defaultdict
+from datasets import load_dataset
+from copy import deepcopy
 
 from src.data.manager_update import UpdateManager
 
@@ -40,54 +42,42 @@ U_ROOT = f"{proj_root}/data/prelim/CodeUpdateArena-pre-PS"
 pilot_root_dir = f"{proj_root}/data/prelim/pilot_run/gpt-4"
 
 
+def decompose_id(identifier):
+    components = identifier.split(":")
+    assert all(len(c) >= 2 for c in components)
+    if all(c[0] == "[" and c[-1] == "]" for c in components):
+        components = [c[1:-1] for c in components]
+    return components
+
 def prepare_arena_dataset(cfg: DictConfig):    
-    proj_root = os.path.dirname(__file__) + "/../.."
-    arena_root = f"{proj_root}/{cfg.data.data_dir}"
-    logger.info(f"Loading data from: {arena_root}")
-    all_updates = list(glob.glob(f"{arena_root}/**/{U_FILE_NAME}", recursive=True))
+    dataset = load_dataset(cfg.data.data_dir)["test"]
+    prorcessed_dataset = []
     
-    dataset = []
-    
-    for update_path in all_updates[:]:
-        update_dir = os.path.dirname(update_path)
-        specific_update_id = update_dir.replace(f"{arena_root}/", "")
-        api_path, update_type_tag, update_idx = specific_update_id.split("/")
+    for datum in dataset:
+        specific_update_id = datum['update']["update_id"]
+        api_path, update_type_tag, update_idx = decompose_id(specific_update_id)
         
         updated_function = UpdatedFunction(api_path=api_path)
         
-        update_dict = json.load(open(update_path, "r"))
-        update_dict["package"] = api_path.split(".")[0]
-        update_dict["api_path"] = api_path
-        update_dict["update_type"] = update_type_tag
-        update_dict["identifier"] = update_idx
-        update_dict["old_function_signature"] = updated_function.function_signature
-        assert len(update_dict["unit_tests_pass_w_update"]) == len(update_dict["unit_tests"])
-        update_dict["unit_tests"] = trim_unit_tests(update_dict)
-            
-        ps_dirs = next(os.walk(update_dir))[1] # get all immediate sub-folder
-        ps_dirs = sorted(ps_dirs)
-        assert all(p.startswith("ProgSyn-") for p in ps_dirs)
-        ps_dirs = [f"{update_dir}/{p}" for p in ps_dirs]
+        update_dict = datum['update']
+        update_dict["old_signature"] = updated_function.function_signature
+        update_dict["unit_tests"] = update_dict["unit_tests"].split("\n\n")
+        update_dict["imports"] = update_dict["imports"].split("\n")
         
-        assert all(os.path.exists(p) for p in ps_dirs)
+        prog_syn_dict = deepcopy(datum)
+        del prog_syn_dict["update"]
         
-        ps_paths = list(glob.glob(f"{update_dir}/**/{PS_FILE_NAME}", recursive=True))
-        assert len(ps_paths) == len(ps_dirs)
-        for ps_path in ps_paths:
-            prog_syn_dict = json.load(open(ps_path, "r"))
-            prog_syn_idx = os.path.basename(os.path.dirname(ps_path))
-            prog_syn_id = f"{specific_update_id}/{prog_syn_idx}"
-            assert len(prog_syn_dict["unit_tests_pass_w_update"]) == len(prog_syn_dict["unit_tests"])
-            prog_syn_dict["unit_tests"] = trim_unit_tests(prog_syn_dict)
-            prog_syn_dict["identifier"] = prog_syn_idx
+        prog_syn_id = prog_syn_dict["prog_syn_id"]
+        prog_syn_dict["unit_tests"] = prog_syn_dict["unit_tests"].split("\n\n")
+        prog_syn_dict["imports"] = prog_syn_dict["imports"].split("\n")  
             
-            dataset.append({
-                "update": update_dict, 
-                "prog_syn": prog_syn_dict,
-                "specific_update_id": specific_update_id,
-                "prog_syn_id": prog_syn_id,
-                "package": api_path.split(".")[0]
-            })
+        prorcessed_dataset.append({
+            "update": update_dict, 
+            "prog_syn": prog_syn_dict,
+            "specific_update_id": specific_update_id,
+            "prog_syn_id": prog_syn_id,
+            "package": api_path.split(".")[0]
+        })
     return {"test": dataset}
 
 
@@ -264,7 +254,6 @@ class OneShotTestBed(TestBed):
         
         self.cache_prefix = cache_prefix
         self.prompt_template = InstructTemplate.from_file(f"{self.proj_root}/{cfg.prompt.source}")
-        
         
         self.update_cfg = OmegaConf.load(f"{self.proj_root}/configs/update_generation.yaml")
         self.progsyn_cfg = OmegaConf.load(f"{self.proj_root}/configs/prog_syn_generation.yaml")

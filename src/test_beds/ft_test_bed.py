@@ -32,12 +32,7 @@ from src.utils.utils import set_random_seed
 from src.test_beds.test_bed import TestBed
 from src.models.ft_model import FinetunedModel, FinetunedCodeLlama
 
-
-
-U_FILE_NAME = "update-content-w_ut.json"
-PS_FILE_NAME = "prog_syn-content-w_ut.json"
-proj_root = os.path.dirname(__file__) + "/../.."
-
+PROJ_ROOT = os.path.dirname(__file__) + "/../.."
 
 def render(cfg, template, datum, example_datum, is_train):
     return template.render(
@@ -107,12 +102,12 @@ def prepare_arena_dataset(cfg: DictConfig):
     assert n_train >= 0, "training_example_per_update must be non-negative."
     logger.info(f"#PS for training per update: {n_train}")
     
-    example_datum = json.load(open(f"{proj_root}/data/example_datum.json", "r"))
+    example_datum = json.load(open(f"{PROJ_ROOT}/data/example_datum.json", "r"))
     grouped_dataset = defaultdict(list)
     for datum in prorcessed_dataset:
         grouped_dataset[datum["specific_update_id"]].append(datum)
-    train_prompt_template = InstructTemplate.from_file(f"{proj_root}/{cfg.prompt.train_source}")
-    eval_prompt_template = InstructTemplate.from_file(f"{proj_root}/{cfg.prompt.eval_source}")
+    train_prompt_template = InstructTemplate.from_file(f"{PROJ_ROOT}/{cfg.prompt.train_source}")
+    eval_prompt_template = InstructTemplate.from_file(f"{PROJ_ROOT}/{cfg.prompt.eval_source}")
     final_datasets = []
     
     logger.info(f"Preparing knowledge editing dataset")
@@ -139,7 +134,7 @@ def prepare_arena_dataset(cfg: DictConfig):
                 assert len(u_dataset["train"]) == n_train
                 u_dataset["test"] = [deepcopy(u_datum)]
             # First make a micro dataset for each specific update
-            # # go through every train instance and instantiate prompt
+            # go through every train instance and instantiate prompt
             for train_i in range(len(u_dataset["train"])):
                 datum = u_dataset["train"][train_i]
                 # add instantiated prompt to each instance
@@ -178,7 +173,7 @@ class FTTestBed(TestBed):
         cfg: DictConfig,
     ) -> None:
         super().__init__(cfg,)
-        self.proj_root = proj_root = os.path.dirname(__file__) + "/../.."
+        self.proj_root = PROJ_ROOT
         self.output_dir = f"caches/{config_name}_k={cfg.data.training_example_per_update}_include-update={cfg.prompt.include_update}_num_epoch={cfg.training.num_epoch}"
         os.makedirs(self.output_dir, exist_ok=True)
         logger.add(f"{self.output_dir}/log.out")
@@ -194,14 +189,10 @@ class FTTestBed(TestBed):
         
         # calculate how many decoding rounds for batch decoding
         self.num_decoding = cfg.evaluation.n_decoding_example
-        n_seq_per_round = min(cfg.generation.num_return_sequences, self.num_decoding)
-        num_decoding_rounds = int(np.ceil(self.num_decoding / n_seq_per_round))
         logger.info(f"#Decoding per test: {self.num_decoding}")
         logger.info(f"N few-shot examples: {cfg.prompt.num_few_shot_examples}")
         
-        # self.prompt_template = InstructTemplate.from_file(f"{self.proj_root}/{cfg.prompt.source}")
-        
-        self.update_cfg = OmegaConf.load(f"{proj_root}/data/prelim/configs/update_generation_v2-1.yaml")
+        self.update_cfg = OmegaConf.load(f"{PROJ_ROOT}/configs/update_generation.yaml")
         
         self.training_args = TrainingArguments(
             output_dir=cfg.output_dir,
@@ -219,7 +210,6 @@ class FTTestBed(TestBed):
             logging_steps=1,
         )
         
-        # self.accelerator = Accelerator()
         
     def get_trainer(self, u_dataset: DatasetDict, ft_model: FinetunedModel):
         training_args = deepcopy(self.training_args)
@@ -245,7 +235,6 @@ class FTTestBed(TestBed):
         logger.info(f"Save root: {save_root}")
         os.makedirs(save_root, exist_ok=True)
         
-        # grouped_eval_results = defaultdict(list)
         for u_dataset in tqdm(self.arena_dataset):
             assert u_dataset["test"].num_rows > 0
             max_token_instance = max(len(ft_model.tokenizer(r['text'])['input_ids']) for r in u_dataset['train'])
@@ -305,7 +294,6 @@ class FTTestBed(TestBed):
             for specific_update_id, random_update_id in random_update_map.items()
         }
         
-        # grouped_eval_results = defaultdict(list)
         for u_dataset in tqdm(self.arena_dataset):
             
             max_token_instance = max(len(ft_model.tokenizer(r['text'])['input_ids']) for r in u_dataset['train'])
@@ -323,7 +311,7 @@ class FTTestBed(TestBed):
             os.makedirs(save_dir, exist_ok=True)
             
             open(f"{save_dir}/train_prompt.txt", "w").write(random_u_dataset["train"][0]["text"])
-            # all_generated_texts = list(glob.glob(f"{save_dir}/**/generated_texts-*.json", recursive=True))
+
             if os.path.exists(
                 f"{save_dir}/generated_texts.json"
                 ) and not rerun:
@@ -382,7 +370,7 @@ class FTTestBed(TestBed):
             specific_update_id = test_datum["specific_update_id"]
             logger.info(f"Save to: {save_root}/{specific_update_id}")
             os.makedirs(f"{save_root}/{specific_update_id}", exist_ok=True)
-            # save_dir = f"{save_root}/{prog_syn_id}/{ft_model.model_name}"
+            
             save_dir = f"{save_root}/{specific_update_id}/{ft_model.model_name}"
             open(f"{save_root}/{specific_update_id}/train_prompt.txt", "w").write(u_dataset["train"][0]["text"])
             open(f"{save_root}/{specific_update_id}/test_prompt.txt", "w").write(test_datum["text"])
@@ -394,7 +382,6 @@ class FTTestBed(TestBed):
             ):
                 continue
             # Initialize the trainer and train
-            # try:
             trainer = self.get_trainer(u_dataset, ft_model)
             trainer.train()
             
@@ -418,7 +405,6 @@ class FTTestBed(TestBed):
             n_test = u_dataset["test"].num_rows
             
             for test_i in range(n_test):
-                # logger.info(f"Evaluating {test_i + 1} / {n_test} of {u_i}th update eval")
                 test_datum = u_dataset["test"][test_i]
                 prog_syn_id = test_datum["prog_syn_id"]
                 save_dir = f"{save_root}/{prog_syn_id}/{model_name}"
@@ -446,7 +432,6 @@ class FTTestBed(TestBed):
                 unit_test_functions = [Function(unit_test) for unit_test in test_datum["prog_syn"]["unit_tests"]]
                 test_reports = []
                 for generated_program in generated_programs:
-                    # assert generated_program, "Failed to extract generated_program"
                     test_report = self.check_unit_tests(
                         update_manager=u_manager, 
                         imports=test_datum["prog_syn"]["imports"], 
@@ -537,9 +522,7 @@ def evaluate(cfg):
     model_name = os.path.basename(cfg.model.model_name_or_path)
     assert model_name == ft_model.model_name
     
-    proj_root = os.path.dirname(__file__) + "/../.."
-    
-    save_root=f"{proj_root}/evaluation_output/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{PROJ_ROOT}/evaluation_output/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     if "Eval-wo-Update" in config_name:
         save_root += "_Eval-wo-Update"
     save_root += f"_lr={cfg.training.lr}"
@@ -558,7 +541,7 @@ def execute(cfg):
     config_name = Path(running_config.job.config_name).stem
     ft_testbed = FTTestBed(config_name, cfg)
     
-    save_root=f"{proj_root}/evaluation_output/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{PROJ_ROOT}/evaluation_output/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     if "Eval-wo-Update" in config_name:
         save_root += "_Eval-wo-Update"
     save_root += f"_lr={cfg.training.lr}"
@@ -576,15 +559,13 @@ def rand_evaluate(cfg):
     config_name = Path(running_config.job.config_name).stem
     ft_testbed = FTTestBed(config_name, cfg) 
     ft_model = FinetunedCodeLlama(cfg)
-
-    proj_root = os.path.dirname(__file__) + "/../.."
     
-    save_root=f"{proj_root}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{PROJ_ROOT}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     save_root += f"_lr={cfg.training.lr}"
     if not cfg.prompt.include_update:
         save_root += "_noUpdate"
     
-    random_update_map = json.load(open(f"{proj_root}/data/random_update_map.json", "r"))
+    random_update_map = json.load(open(f"{PROJ_ROOT}/data/random_update_map.json", "r"))
     
     ft_testbed.evaluate_arena_w_random_update(
         ft_model,
@@ -598,10 +579,8 @@ def rand_execute(cfg):
     ft_testbed = FTTestBed(config_name, cfg)
     
     model_name = os.path.basename(cfg.model.model_name_or_path) 
-
-    proj_root = os.path.dirname(__file__) + "/../.."
     
-    save_root=f"{proj_root}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{PROJ_ROOT}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     save_root += f"_lr={cfg.training.lr}"
     if not cfg.prompt.include_update:
         save_root += "_noUpdate"
@@ -616,13 +595,11 @@ def specificity(cfg):
     config_name = Path(running_config.job.config_name).stem
     ft_testbed = FTTestBed(config_name, cfg)
     ft_model = FinetunedCodeLlama(cfg)
-
-    proj_root = os.path.dirname(__file__) + "/../.."
     
-    sampled_updates_ids = json.load(open(f"{proj_root}/data/sampled_update_ids.json", "r"))
-    sampled_humaneval_task_ids = json.load(open(f"{proj_root}/data/sampled_humaneval_task_ids.json", "r"))
+    sampled_updates_ids = json.load(open(f"{PROJ_ROOT}/data/sampled_update_ids.json", "r"))
+    sampled_humaneval_task_ids = json.load(open(f"{PROJ_ROOT}/data/sampled_humaneval_task_ids.json", "r"))
     
-    save_root=f"{proj_root}/evaluation_output/specificity/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{PROJ_ROOT}/evaluation_output/specificity/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     save_root += f"_lr={cfg.training.lr}"
         
     if not cfg.prompt.include_update:
