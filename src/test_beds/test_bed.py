@@ -259,7 +259,7 @@ class OneShotTestBed(TestBed):
         set_random_seed(cfg.seed)
         # self.rand_idx = 6 # np.random.choice(len(self.test_dataset))
         # self.example_datum = self.test_dataset.pop(self.rand_idx)
-        self.example_datum = self.prepare_example_datum()
+        self.example_datum = json.load(open(f"{proj_root}/data/example_datum.json", "r"))
         self.num_public_unit_tests = cfg.prompt.num_public_unit_tests
         
         self.cache_prefix = cache_prefix
@@ -271,14 +271,14 @@ class OneShotTestBed(TestBed):
         
     def prepare_prompt(self, datum):
         # add option to remove CoT in code
-        solution_new = self.example_datum["prog_syn"]["solution_new"]
+        solution_new = self.example_datum["prog_syn"]["ref_solution"]
         # solution_new_no_comment = "\n".join([l for l in solution_new.split("\n") if not l.strip().startswith("#")])
         prompt = self.prompt_template.render(
             # Update information
-            old_function_signature=datum["update"]["old_function_signature"],
-            new_function_signature=datum["update"]["new_function_signature"],
-            update_description=datum["update"]["update_description"],
-            update_docstring=datum["update"]["update_docstring"],
+            old_function_signature=datum["update"]["old_signature"],
+            new_function_signature=datum["update"]["signature"],
+            update_description=datum["update"]["description"],
+            update_docstring=datum["update"]["docstring"],
             # one-shot example
             example_scenario=self.example_datum["prog_syn"]["scenario"],
             example_problem=self.example_datum["prog_syn"]["problem"],
@@ -412,7 +412,7 @@ class OneShotTestBed(TestBed):
             # extract solution code
             generated_programs = list(map(self.prompt_template.solution_extractor, generated_solutions))
             # create update manager
-            u_manager = UpdateManagerV21(
+            u_manager = UpdateManager(
                 cfg=self.update_cfg, 
                 api_path=test_datum["update"]["api_path"], 
                 update_tag=test_datum["update"]["update_type"]
