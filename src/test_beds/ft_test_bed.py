@@ -277,7 +277,7 @@ class FTTestBed(TestBed):
             # refresh peft for next edit
             ft_model.refresh()
     
-    def evaluate_arena_w_random_test_fixed(
+    def evaluate_arena_w_random_update(
         self, 
         ft_model: FinetunedModel,
         save_root, 
@@ -344,65 +344,6 @@ class FTTestBed(TestBed):
         
             # refresh peft for next edit
             ft_model.refresh()
-    
-    def evaluate_arena_with_smaller_updates(
-        self,
-        ft_model: FinetunedModel,
-        save_root, 
-        sampled_updates_ids,
-        rerun=False):
-        
-        update2u_datasets = defaultdict(list)
-        for u_dataset in self.arena_dataset:
-            prog_syn_id = u_dataset["test"][0]["prog_syn_id"]
-            specific_update_id = "/".join(prog_syn_id.split("/")[:-1])
-            update2u_datasets[specific_update_id].append(u_dataset)
-        update2u_datasets = {
-            k: sorted(
-                vs, 
-                key=lambda x: int(x["test"][0]["prog_syn_id"].split("-")[-1])
-            )
-            for k, vs in update2u_datasets.items()
-        }
-        sampled_u_datasets = [
-            update2u_datasets[specific_update_id][0]
-            for specific_update_id in sampled_updates_ids
-        ]
-        
-        logger.info(f"Save root: {save_root}")
-        os.makedirs(save_root, exist_ok=True)
-        
-        # grouped_eval_results = defaultdict(list)
-        for u_dataset in tqdm(sampled_u_datasets):
-            assert u_dataset["test"].num_rows > 0
-            max_token_instance = max(len(ft_model.tokenizer(r['text'])['input_ids']) for r in u_dataset['train'])
-            logger.info(f"Max #token / instance in train: {max_token_instance}")
-            n_test = u_dataset["test"].num_rows
-            assert n_test == 1
-            test_datum = u_dataset["test"][0]
-            prog_syn_id = test_datum["prog_syn_id"]
-            save_dir = f"{save_root}/{prog_syn_id}/{ft_model.model_name}"
-            logger.info(f"Save to : {save_dir}")
-            os.makedirs(save_dir, exist_ok=True)
-            open(f"{save_dir}/train_prompt.txt", "w").write(u_dataset["train"][0]["text"])
-            if os.path.exists(f"{save_dir}/generated_texts.json") and not rerun:
-                continue
-            # Initialize the trainer and train
-            try:
-                trainer = self.get_trainer(u_dataset, ft_model)
-                trainer.train()
-            except:
-                open(f"{save_root}/{ft_model.model_name}_failed_data.txt", "a").write(
-                    f"Test datum: {str(u_dataset['train']['prog_syn_id'])}\n"
-                )
-            
-            # generate with finetuned model and extract solution
-            open(f"{save_dir}/test_prompt.txt", "w").write(test_datum["text"])
-            generated_texts = ft_model.generate_solutions(test_datum["text"])
-            json.dump(generated_texts, open(f"{save_dir}/generated_texts.json", "w"))
-        
-            # refresh peft for next edit
-            ft_model.refresh()
 
     def evaluate_arena_specificity(
         self, 
@@ -447,69 +388,6 @@ class FTTestBed(TestBed):
             open(f"{save_root}/{specific_update_id}/test_prompt.txt", "w").write(test_datum["text"])
             logger.info(f"Evaluating {specific_update_id}")
                 
-            if all(
-                os.path.exists(f"{save_dir}/{filename}") 
-                for filename in ["task_id2genereted_texts.json", "exec_results.csv"]
-            ):
-                continue
-            # Initialize the trainer and train
-            # try:
-            trainer = self.get_trainer(u_dataset, ft_model)
-            trainer.train()
-            
-            eval_on_humaneval(
-                self.cfg,
-                ft_model,
-                save_root=f"{save_root}/{specific_update_id}", 
-                sampled_task_ids=sampled_task_ids
-            )
-        
-            # refresh peft for next edit
-            ft_model.refresh()
-    
-    def evaluate_arena_specificity_base(
-        self, 
-        ft_model: FinetunedModel,
-        save_root, 
-        sampled_updates_ids,
-        sampled_task_ids = None,
-        rerun=False
-    ):
-        logger.info(f"Save root: {save_root}")
-        os.makedirs(save_root, exist_ok=True)
-        update2u_datasets = defaultdict(list)
-        for u_dataset in self.arena_dataset:
-            prog_syn_id = u_dataset["test"][0]["prog_syn_id"]
-            specific_update_id = "/".join(prog_syn_id.split("/")[:-1])
-            update2u_datasets[specific_update_id].append(u_dataset)
-        update2u_datasets = {
-            k: sorted(
-                vs, 
-                key=lambda x: int(x["test"][0]["prog_syn_id"].split("-")[-1])
-            )
-            for k, vs in update2u_datasets.items()
-        }
-        sampled_u_datasets = [
-            update2u_datasets[specific_update_id][0]
-            for specific_update_id in sampled_updates_ids
-        ]
-        
-        for u_dataset in tqdm(sampled_u_datasets[:3]):
-            assert u_dataset["test"].num_rows > 0
-            max_token_instance = max(len(ft_model.tokenizer(r['text'])['input_ids']) for r in u_dataset['train'])
-            logger.info(f"Max #token / instance in train: {max_token_instance}")
-            n_test = u_dataset["test"].num_rows
-            assert n_test == 1
-            test_datum = u_dataset["test"][0]
-            specific_update_id = test_datum["specific_update_id"]
-            logger.info(f"Save to: {save_root}/{specific_update_id}")
-            os.makedirs(f"{save_root}/{specific_update_id}", exist_ok=True)
-            # save_dir = f"{save_root}/{prog_syn_id}/{ft_model.model_name}"
-            save_dir = f"{save_root}/{specific_update_id}/{ft_model.model_name}"
-            open(f"{save_root}/{specific_update_id}/train_prompt.txt", "w").write(u_dataset["train"][0]["text"])
-            open(f"{save_root}/{specific_update_id}/test_prompt.txt", "w").write(test_datum["text"])
-            logger.info(f"Evaluating {specific_update_id}")
-            
             if all(
                 os.path.exists(f"{save_dir}/{filename}") 
                 for filename in ["task_id2genereted_texts.json", "exec_results.csv"]
@@ -650,46 +528,6 @@ class FTTestBed(TestBed):
         eval_results["identifier"] = datum["identifier"]
         return eval_results
 
-def rand_evaluate(cfg):
-    running_config = HydraConfig.get()
-    config_name = Path(running_config.job.config_name).stem
-    ft_testbed = FTTestBed(config_name, cfg) 
-    ft_model = FinetunedCodeLlama(cfg)
-
-    proj_root = os.path.dirname(__file__) + "/../.."
-    
-    save_root=f"{proj_root}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
-    save_root += f"_lr={cfg.training.lr}"
-    if not cfg.prompt.include_update:
-        save_root += "_noUpdate"
-    
-    random_update_map = json.load(open(f"{proj_root}/evaluation_output/random_update_map_final.json", "r"))
-    
-    ft_testbed.evaluate_arena_w_random_test_fixed(
-        ft_model,
-        save_root=save_root,
-        random_update_map=random_update_map,
-    )
-
-def rand_execute(cfg):
-    running_config = HydraConfig.get()
-    config_name = Path(running_config.job.config_name).stem
-    ft_testbed = FTTestBed(config_name, cfg)
-    
-    model_name = os.path.basename(cfg.model.model_name_or_path) 
-
-    proj_root = os.path.dirname(__file__) + "/../.."
-    
-    save_root=f"{proj_root}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
-    save_root += f"_lr={cfg.training.lr}"
-    if not cfg.prompt.include_update:
-        save_root += "_noUpdate"
-    
-    ft_testbed.execute_arena(
-        save_root=save_root,
-        model_name=model_name,
-    )
-
 def evaluate(cfg):
     running_config = HydraConfig.get()
     config_name = Path(running_config.job.config_name).stem
@@ -733,6 +571,46 @@ def execute(cfg):
     )
 
 
+def rand_evaluate(cfg):
+    running_config = HydraConfig.get()
+    config_name = Path(running_config.job.config_name).stem
+    ft_testbed = FTTestBed(config_name, cfg) 
+    ft_model = FinetunedCodeLlama(cfg)
+
+    proj_root = os.path.dirname(__file__) + "/../.."
+    
+    save_root=f"{proj_root}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root += f"_lr={cfg.training.lr}"
+    if not cfg.prompt.include_update:
+        save_root += "_noUpdate"
+    
+    random_update_map = json.load(open(f"{proj_root}/data/random_update_map.json", "r"))
+    
+    ft_testbed.evaluate_arena_w_random_update(
+        ft_model,
+        save_root=save_root,
+        random_update_map=random_update_map,
+    )
+
+def rand_execute(cfg):
+    running_config = HydraConfig.get()
+    config_name = Path(running_config.job.config_name).stem
+    ft_testbed = FTTestBed(config_name, cfg)
+    
+    model_name = os.path.basename(cfg.model.model_name_or_path) 
+
+    proj_root = os.path.dirname(__file__) + "/../.."
+    
+    save_root=f"{proj_root}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root += f"_lr={cfg.training.lr}"
+    if not cfg.prompt.include_update:
+        save_root += "_noUpdate"
+    
+    ft_testbed.execute_arena(
+        save_root=save_root,
+        model_name=model_name,
+    )
+
 def specificity(cfg):
     running_config = HydraConfig.get()
     config_name = Path(running_config.job.config_name).stem
@@ -757,100 +635,22 @@ def specificity(cfg):
         sampled_task_ids=sampled_humaneval_task_ids[:82],
     )
 
-def specificity_base(cfg):
-    running_config = HydraConfig.get()
-    config_name = Path(running_config.job.config_name).stem
-    ft_testbed = FTTestBed(config_name, cfg)
-
-    ft_model = FinetunedCodeLlama(cfg)
-
-    proj_root = os.path.dirname(__file__) + "/../.."
-    
-    sampled_updates_ids = json.load(open(f"{proj_root}/data/sampled_update_ids.json", "r"))
-    sampled_humaneval_task_ids = json.load(open(f"{proj_root}/data/sampled_humaneval_task_ids.json", "r"))
-    
-    save_root=f"{proj_root}/evaluation_output/specificity_base/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
-    save_root += f"_lr={cfg.training.lr}"
-    if not cfg.prompt.include_update:
-        save_root += "_noUpdate"
-    
-    ft_testbed.evaluate_arena_specificity_base(
-        ft_model,
-        save_root=save_root,
-        sampled_updates_ids=sampled_updates_ids[:25],
-        sampled_task_ids=sampled_humaneval_task_ids[:82],
-    )
-
-def hyper_specificity(cfg):
-    running_config = HydraConfig.get()
-    config_name = Path(running_config.job.config_name).stem
-    ft_testbed = FTTestBed(config_name, cfg)
-    ft_model = FinetunedCodeLlama(cfg)
-
-    proj_root = os.path.dirname(__file__) + "/../.."
-    
-    sampled_updates_ids = json.load(open(f"{proj_root}/data/sampled_update_ids.json", "r"))
-    sampled_humaneval_task_ids = json.load(open(f"{proj_root}/data/sampled_humaneval_task_ids.json", "r"))
-    
-    
-    save_root=f"{proj_root}/hyper_search/specificity/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}_lr={cfg.training.lr}"
-    if not cfg.prompt.include_update:
-        save_root += "_noUpdate"
-    
-    ft_testbed.evaluate_arena_specificity(
-        ft_model,
-        save_root=save_root,
-        sampled_updates_ids=sampled_updates_ids[:10],
-        sampled_task_ids=sampled_humaneval_task_ids[:20],
-    )
-
-def hyper_search(cfg):
-    running_config = HydraConfig.get()
-    config_name = Path(running_config.job.config_name).stem
-    ft_testbed = FTTestBed(config_name, cfg)
-    ft_model = FinetunedCodeLlama(cfg)
-
-    proj_root = os.path.dirname(__file__) + "/../.."
-    
-    sampled_updates_ids = json.load(open(f"{proj_root}/data/sampled_update_ids.json", "r"))
-
-    save_root=f"{proj_root}/hyper_search/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}_lr={cfg.training.lr}"
-    if not cfg.prompt.include_update:
-        save_root += "_noUpdate"
-
-    ft_testbed.evaluate_arena_with_smaller_updates(
-        ft_model,
-        save_root=save_root,
-        sampled_updates_ids=sampled_updates_ids[:10]
-    )
-    model_name = os.path.basename(cfg.model.model_name_or_path)
-    ft_testbed.execute_arena(
-        save_root=save_root,
-        model_name=model_name
-    )
-    
-
 @hydra.main(version_base=None , config_path="../../configs", config_name="lora_zs.yaml")
 def main(
     cfg
 ):
     if cfg.usage == "eval":
         evaluate(cfg)
-    elif cfg.usage == "rand_eval":
-        rand_evaluate(cfg)
     elif cfg.usage == "exec":
         execute(cfg)
+    elif cfg.usage == "rand_eval":
+        rand_evaluate(cfg)
     elif cfg.usage == "rand_exec":
         rand_execute(cfg)
     elif cfg.usage == "specificity":
         specificity(cfg)
-    elif cfg.usage == "specificity_base":
-        specificity_base(cfg)
-    elif cfg.usage == "hyper_specificity":
-        hyper_specificity(cfg)
     else:
-        assert cfg.usage == "hyper"
-        hyper_search(cfg)
+        raise ValueError(f"Invalid usage: {cfg.usage}")
     
 if __name__ == "__main__":
     main()
