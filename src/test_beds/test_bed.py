@@ -14,7 +14,6 @@ from loguru import logger
 from collections import defaultdict
 
 from src.data.manager_update import UpdateManager
-from src.data.manager_prog_syn import ProgSynManagerV2
 
 from src.models.prepend_model import PrependModel, PrependCodeLlama, PrependGPT4
 

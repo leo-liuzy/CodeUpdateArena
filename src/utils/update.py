@@ -26,8 +26,8 @@ from inspect import signature
 import numpy as np
 
 DOC_STRING_ROOT_NAME = "update_functions" # it assume py
-DOC_STRING_DIR = f"{dirname(__file__)}/{DOC_STRING_ROOT_NAME}"
-os.makedirs(DOC_STRING_DIR, exist_ok=Tuple)
+DOC_STRING_DIR = f"{dirname(__file__)}/../../data/{DOC_STRING_ROOT_NAME}"
+os.makedirs(DOC_STRING_DIR, exist_ok=True)
 
 
 class Action(Enum):

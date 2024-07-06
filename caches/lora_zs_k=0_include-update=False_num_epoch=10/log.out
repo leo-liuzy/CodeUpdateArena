@@ -1,0 +1,65 @@
+2024-07-05 16:39:51.649 | INFO     | __main__:__init__:186 - Command runned: python src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 16:39:51.650 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 16:39:51.650 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 16:39:51.651 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 16:39:51.651 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 16:54:43.780 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 16:54:43.781 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 16:54:43.782 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 16:54:43.782 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 16:54:43.782 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 16:55:24.284 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 16:55:24.284 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 16:55:24.285 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 16:55:24.285 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 16:55:24.285 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 16:56:48.167 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 16:56:48.168 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 16:56:48.168 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 16:56:48.168 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 16:56:48.169 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 17:00:38.690 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 17:00:38.690 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 17:00:38.691 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 17:00:38.691 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 17:00:38.691 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 17:17:59.998 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 17:17:59.998 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 17:17:59.999 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 17:17:59.999 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 17:18:00.000 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 17:18:02.503 | INFO     | __main__:prepare_arena_dataset:108 - #PS for training per update: 0
+2024-07-05 17:18:57.706 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 17:18:57.707 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 17:18:57.708 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 17:18:57.708 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 17:18:57.708 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 17:19:00.395 | INFO     | __main__:prepare_arena_dataset:108 - #PS for training per update: 0
+2024-07-05 17:20:48.146 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 17:20:48.146 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 17:20:48.147 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 17:20:48.147 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 17:20:48.147 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 17:20:50.586 | INFO     | __main__:prepare_arena_dataset:108 - #PS for training per update: 0
+2024-07-05 17:20:50.595 | INFO     | __main__:prepare_arena_dataset:118 - Preparing knowledge editing dataset
+2024-07-05 17:22:07.219 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 17:22:07.220 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 17:22:07.220 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 17:22:07.221 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 17:22:07.221 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 17:22:09.792 | INFO     | __main__:prepare_arena_dataset:108 - #PS for training per update: 0
+2024-07-05 17:22:09.803 | INFO     | __main__:prepare_arena_dataset:118 - Preparing knowledge editing dataset
+2024-07-05 17:25:15.233 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 17:25:15.233 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 17:25:15.234 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 17:25:15.234 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 17:25:15.234 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 17:25:17.669 | INFO     | __main__:prepare_arena_dataset:108 - #PS for training per update: 0
+2024-07-05 17:25:17.679 | INFO     | __main__:prepare_arena_dataset:118 - Preparing knowledge editing dataset
+2024-07-05 18:26:19.481 | INFO     | __main__:__init__:186 - Command runned: python /u/zliu/CodeUpdateArena/src/test_beds/ft_test_bed.py --config-name=lora_zs usage=eval prompt.include_update=False model.model_name_or_path=/u/zliu/datastor1/shared_resources/models/deepseek/deepseek-coder-7b-instruct-v1.5
+2024-07-05 18:26:19.481 | INFO     | __main__:__init__:187 - Config name: lora_zs
+2024-07-05 18:26:19.482 | INFO     | __main__:__init__:188 - DEBUGGING: False
+2024-07-05 18:26:19.482 | INFO     | __main__:__init__:189 - GPU ID(s): 4
+2024-07-05 18:26:19.482 | INFO     | __main__:__init__:190 - Seed: 42
+2024-07-05 18:28:02.264 | INFO     | __main__:prepare_arena_dataset:108 - #PS for training per update: 0
+2024-07-05 18:28:02.274 | INFO     | __main__:prepare_arena_dataset:118 - Preparing knowledge editing dataset

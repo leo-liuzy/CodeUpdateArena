@@ -78,8 +78,8 @@ def prepare_arena_dataset(cfg: DictConfig):
     dataset = load_dataset(cfg.data.data_dir)["test"]
     prorcessed_dataset = []
     for datum in dataset:
-        specific_update_id = datum['update']
-        api_path, _, _ = decompose_id(datum['update']["update_id"])
+        specific_update_id = datum['update']["update_id"]
+        api_path, _, _ = decompose_id(specific_update_id)
         
         updated_function = UpdatedFunction(api_path=api_path)
         
@@ -93,7 +93,7 @@ def prepare_arena_dataset(cfg: DictConfig):
         
         prog_syn_id = prog_syn_dict["prog_syn_id"]
         prog_syn_dict["unit_tests"] = prog_syn_dict["unit_tests"].split("\n\n")
-        prog_syn_dict["imports"] = update_dict["imports"].split("\n")
+        prog_syn_dict["imports"] = prog_syn_dict["imports"].split("\n")
             
         prorcessed_dataset.append({
             "update": update_dict, 
@@ -107,9 +107,9 @@ def prepare_arena_dataset(cfg: DictConfig):
     assert n_train >= 0, "training_example_per_update must be non-negative."
     logger.info(f"#PS for training per update: {n_train}")
     
-    example_datum = prepare_example_datum()
+    example_datum = json.load(open(f"{proj_root}/data/example_datum.json", "r"))
     grouped_dataset = defaultdict(list)
-    for datum in dataset:
+    for datum in prorcessed_dataset:
         grouped_dataset[datum["specific_update_id"]].append(datum)
     train_prompt_template = InstructTemplate.from_file(f"{proj_root}/{cfg.prompt.train_source}")
     eval_prompt_template = InstructTemplate.from_file(f"{proj_root}/{cfg.prompt.eval_source}")
@@ -117,9 +117,9 @@ def prepare_arena_dataset(cfg: DictConfig):
     
     logger.info(f"Preparing knowledge editing dataset")
     for u_id, u_data in tqdm(grouped_dataset.items()):
-        u_data = sorted(u_data, key=lambda x: int(x["prog_syn_id"].split("-")[-1]))
+        u_data = sorted(u_data, key=lambda x: int(decompose_id(x["prog_syn_id"])[-1].split("-")[-1]))
         assert len(u_data) > n_train, f"#PS / update must be more than n_train={n_train}"
-        # debug_count += 1
+        
         for u_datum_i, u_datum in enumerate(u_data):
             if n_train == 0:
                 u_dataset = {
@@ -208,16 +208,12 @@ class FTTestBed(TestBed):
             optim="adamw_torch",
             learning_rate=cfg.training.lr,
             weight_decay=cfg.training.decay,
-            # lr_scheduler_type="linear",
             lr_scheduler_type="constant",
             warmup_ratio=cfg.training.warmup_ratio,
             gradient_accumulation_steps=cfg.training.gradient_accumulation_steps,
             eval_strategy="no",
             save_strategy="no",
             logging_strategy='steps',
-            # save_steps=0.25,
-            # save_total_limit=2, # save best and last model
-            # load_best_model_at_end=True,
             report_to="none",
             logging_first_step=True,
             logging_steps=1,
@@ -287,7 +283,7 @@ class FTTestBed(TestBed):
         save_root, 
         random_update_map,
         rerun=False,
-        ):
+    ):
         logger.info(f"Save root: {save_root}")
         os.makedirs(save_root, exist_ok=True)
         
