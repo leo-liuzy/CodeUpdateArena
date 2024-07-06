@@ -8,7 +8,9 @@ import pandas as pd
 
 from tqdm import tqdm
 from time import time
+from pathlib import Path
 from omegaconf import DictConfig, OmegaConf
+from hydra.core.hydra_config import HydraConfig
 from typing import List, Callable
 from loguru import logger
 from collections import defaultdict
@@ -264,53 +266,9 @@ class OneShotTestBed(TestBed):
         self.prompt_template = InstructTemplate.from_file(f"{self.proj_root}/{cfg.prompt.source}")
         
         
-        self.update_cfg = OmegaConf.load(f"{self.proj_root}/data/prelim/configs/update_generation_v2-1.yaml")
-        self.progsyn_cfg = OmegaConf.load(f"{self.proj_root}/data/prelim/configs/prog_syn_generation_v2-1.yaml")
-    
-    def prepare_example_datum(self):
-        assert os.path.exists(f"{U_ROOT}/removed_update2ps.json")
+        self.update_cfg = OmegaConf.load(f"{self.proj_root}/configs/update_generation.yaml")
+        self.progsyn_cfg = OmegaConf.load(f"{self.proj_root}/configs/prog_syn_generation.yaml")
         
-        removed_update2ps = json.load(open(f"{U_ROOT}/removed_update2ps.json", "r"))
-        assert len(removed_update2ps.items()) == 1
-        specific_update_id, ps_dirs = list(removed_update2ps.items())[0]
-        ps_dirs = sorted(ps_dirs)
-        
-        update_dir = f"{U_ROOT}/{specific_update_id}"
-        api_path, update_type_tag, update_idx = specific_update_id.split("/")
-        
-        updated_function = UpdatedFunction(api_path=api_path)
-        
-        update_dict = json.load(open(f"{update_dir}/{U_FILE_NAME}", "r"))
-        
-        update_dict["package"] = api_path.split(".")[0]
-        update_dict["api_path"] = api_path
-        update_dict["update_type"] = update_type_tag
-        update_dict["update_idx"] = update_idx
-        update_dict["old_function_signature"] = updated_function.function_signature
-        assert len(update_dict["unit_tests_pass_w_update"]) == len(update_dict["unit_tests"])
-        update_dict["unit_tests"] = trim_unit_tests(update_dict)
-        
-        ps_dir = ps_dirs[0]
-        ps_paths = list(glob.glob(f"{pilot_root_dir}/{ps_dir}/**/{PS_FILE_NAME}", recursive=True))
-        assert len(ps_paths) == 1
-        ps_path = ps_paths[0]
-        # assert len(ps_paths) == len(ps_dirs)
-        prog_syn_dict = json.load(open(ps_path, "r"))
-        prog_syn_idx = os.path.basename(os.path.dirname(ps_path))
-        prog_syn_id = f"{specific_update_id}/{prog_syn_idx}"
-        assert len(prog_syn_dict["unit_tests_pass_w_update"]) == len(prog_syn_dict["unit_tests"])
-        prog_syn_dict["unit_tests"] = trim_unit_tests(prog_syn_dict)
-        prog_syn_dict["prog_syn_idx"] = prog_syn_idx
-        
-        return {
-            "update": update_dict, 
-            "prog_syn": prog_syn_dict,
-            "specific_update_id": specific_update_id,
-            "prog_syn_id": prog_syn_id,
-            "package": api_path.split(".")[0]
-        }
-         
-    
     def prepare_prompt(self, datum):
         # add option to remove CoT in code
         solution_new = self.example_datum["prog_syn"]["solution_new"]
@@ -412,7 +370,7 @@ class OneShotTestBed(TestBed):
             ):
                 continue
             
-            u_manager = UpdateManagerV21(
+            u_manager = UpdateManager(
                 cfg=self.update_cfg, 
                 api_path=test_datum["update"]["api_path"], 
                 update_tag=test_datum["update"]["update_type"]
@@ -492,47 +450,52 @@ class OneShotTestBed(TestBed):
         return df, grouped_df
     
 def generate_text(cfg):
-    test_bed = OneShotTestBed(cfg, cache_prefix="neurips_base")
-    # test_bed = OneShotTestBed(cfg, cache_prefix="neurips")
-    prepend_model = PrependCodeLlama(cfg)
-    # prepend_model = PrependGPT4(cfg)
+    running_config = HydraConfig.get()
+    config_name = Path(running_config.job.config_name).stem
+    
+    if "base" in config_name:
+        exp_name = "base"
+    else:
+        assert "prepend" in config_name
+        exp_name = "prepend"
+        
+    test_bed = OneShotTestBed(cfg, cache_prefix=exp_name)
+    if "gpt-4" in cfg.model.model_name_or_path:
+        prepend_model = PrependGPT4(cfg)
+    else:    
+        prepend_model = PrependCodeLlama(cfg)
+    
     proj_root = os.path.dirname(__file__) + "/../.."
-    # df, grouped_df = test_bed.evaluate(prepend_model)
-    # test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/evaluate_base/prepend_n={cfg.evaluation.n_decoding_example}_noUpdate")
-    # test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/prepend_n={cfg.evaluation.n_decoding_example}")
     
-    # test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output_final/evaluate_base/debug_prepend")
-    
+    test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output/{exp_name}_n={cfg.evaluation.n_decoding_example}")
+
 def run_exec(cfg):
-    test_bed = OneShotTestBed(cfg, cache_prefix="neurips_base")
-    # test_bed = OneShotTestBed(cfg, cache_prefix="neurips")
-    # model_name = "CodeLlama-7b-Instruct-hf"
-    # model_name = "deepseek-coder-7b-instruct-v1.5"
-    model_name = "deepseek-coder-6.7b-instruct"
-    # model_name = "gpt-4"
+    running_config = HydraConfig.get()
+    config_name = Path(running_config.job.config_name).stem
+    
+    if "base" in config_name:
+        exp_name = "base"
+    else:
+        assert "prepend" in config_name
+        exp_name = "prepend"
+    
+    test_bed = OneShotTestBed(cfg, cache_prefix=exp_name)
+    model_name = os.path.basename(cfg.model.model_name_or_path)
     
     test_bed.execute_arena(
-        # save_root=f"{proj_root}/evaluation_output/prepend_n={cfg.evaluation.n_decoding_example}",
-        # save_root=f"{proj_root}/evaluation_output_final/evaluate_base/FT-0_n={cfg.evaluation.n_decoding_example}_lr=0.001_noUpdate",
-        save_root=f"{proj_root}/evaluation_output_final/evaluate_base/prepend_n={cfg.evaluation.n_decoding_example}_noUpdate",
-        model_name=model_name
+        save_root=f"{proj_root}/evaluation_output/{exp_name}_n={cfg.evaluation.n_decoding_example}",
+        model_name=model_name,
     )
     
-@hydra.main(version_base=None , config_path="../../configs", config_name="base_tool_neurips.yaml")
+@hydra.main(version_base=None , config_path="../../configs", config_name="base.yaml")
 def main(
     cfg
 ):
-    
-    generate_text(cfg)
-    # run_exec(cfg)
-    print()
+    if cfg.usage == "eval":
+        generate_text(cfg)
+    else:
+        assert cfg.usage == "exec", f"Invalid Usage: {cfg.usage}"
+        run_exec(cfg)
     
 if __name__ == "__main__":
     main()
-    # print("Eval summary:")
-    # print(df.describe().T)
-    # print("\n\n")
-    # print("Grouped eval summary:")
-    # print(pd.DataFrame([x.describe().loc["mean"] for x in grouped_df.values()]).describe().T)
-    # print()
-    # prepend dataset

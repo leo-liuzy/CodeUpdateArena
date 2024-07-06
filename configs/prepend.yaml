@@ -17,6 +17,8 @@ output_dir:
 prompt:
   source: prompts/instruction_style_one_shot.jinja2
 
+usage: eval
+
 seed: 42
 debug: false
 rerun_eval: false

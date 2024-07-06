@@ -430,9 +430,6 @@ class FTTestBed(TestBed):
             update2u_datasets[specific_update_id][0]
             for specific_update_id in sampled_updates_ids
         ]
-        # grouped_eval_results = defaultdict(list)
-        # sampled_u_dataset = self.arena_dataset[:2] + self.arena_dataset[-2:]
-        # sampled_task_ids = json.load(open(f"{proj_root}/evaluation_output_dedup/specificity/sampled_task_ids.json", "r"))[-4:]
         
         for u_dataset in tqdm(sampled_u_datasets):
             assert u_dataset["test"].num_rows > 0
@@ -534,7 +531,6 @@ class FTTestBed(TestBed):
             ft_model.refresh()
     
     def execute_arena(self, save_root, model_name):
-        # TODO: make this a class method
         print(f"Evaluating results from: {model_name}")
         print(f"Saving to: {save_root}")
         assert os.path.exists(save_root), f"Save dir: {save_root}"
@@ -563,7 +559,7 @@ class FTTestBed(TestBed):
                 ):
                     continue
                 
-                u_manager = UpdateManagerV21(
+                u_manager = UpdateManager(
                     cfg=self.update_cfg, 
                     api_path=test_datum["update"]["api_path"], 
                     update_tag=test_datum["update"]["update_type"]
@@ -654,66 +650,20 @@ class FTTestBed(TestBed):
         eval_results["identifier"] = datum["identifier"]
         return eval_results
 
-
-def base_evaluate(cfg):
-    running_config = HydraConfig.get()
-    config_name = Path(running_config.job.config_name).stem
-    cfg.training.num_epoch = 0
-    
-    ft_testbed = FTTestBed(config_name, cfg)
-    ft_model = FinetunedCodeLlama(cfg)
-    
-    proj_root = os.path.dirname(__file__) + "/../.."
-    
-    save_root=f"{proj_root}/evaluation_output_final/evaluate_base/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
-    save_root += f"_lr={cfg.training.lr}"
-    if not cfg.prompt.include_update:
-        save_root += "_noUpdate"
-    
-    ft_testbed.evaluate_arena(
-        ft_model,
-        save_root=save_root
-    )
-    model_name = os.path.basename(cfg.model.model_name_or_path)
-    assert model_name == ft_model.model_name
-
-def base_execute(cfg):
-    running_config = HydraConfig.get()
-    config_name = Path(running_config.job.config_name).stem
-    cfg.training.num_epoch = 0
-    
-    ft_testbed = FTTestBed(config_name, cfg)
-    
-    proj_root = os.path.dirname(__file__) + "/../.."
-    
-    save_root=f"{proj_root}/evaluation_output_final/evaluate_base/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
-    save_root += f"_lr={cfg.training.lr}"
-    if not cfg.prompt.include_update:
-        save_root += "_noUpdate"
-    
-    model_name = os.path.basename(cfg.model.model_name_or_path)
-    
-    ft_testbed.execute_arena(
-        save_root=save_root,
-        model_name=model_name
-    )
-
 def rand_evaluate(cfg):
     running_config = HydraConfig.get()
     config_name = Path(running_config.job.config_name).stem
-    ft_testbed = FTTestBed(config_name, cfg)
-    # 
-    # print()    
+    ft_testbed = FTTestBed(config_name, cfg) 
     ft_model = FinetunedCodeLlama(cfg)
 
     proj_root = os.path.dirname(__file__) + "/../.."
     
-    save_root=f"{proj_root}/evaluation_output_final/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{proj_root}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     save_root += f"_lr={cfg.training.lr}"
     if not cfg.prompt.include_update:
         save_root += "_noUpdate"
     
-    random_update_map = json.load(open(f"{proj_root}/evaluation_output_final/random_update_map_final.json", "r"))
+    random_update_map = json.load(open(f"{proj_root}/evaluation_output/random_update_map_final.json", "r"))
     
     ft_testbed.evaluate_arena_w_random_test_fixed(
         ft_model,
@@ -730,7 +680,7 @@ def rand_execute(cfg):
 
     proj_root = os.path.dirname(__file__) + "/../.."
     
-    save_root=f"{proj_root}/evaluation_output_final/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{proj_root}/evaluation_output/rand-FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     save_root += f"_lr={cfg.training.lr}"
     if not cfg.prompt.include_update:
         save_root += "_noUpdate"
@@ -751,7 +701,7 @@ def evaluate(cfg):
     
     proj_root = os.path.dirname(__file__) + "/../.."
     
-    save_root=f"{proj_root}/evaluation_output_final/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{proj_root}/evaluation_output/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     if "Eval-wo-Update" in config_name:
         save_root += "_Eval-wo-Update"
     save_root += f"_lr={cfg.training.lr}"
@@ -770,7 +720,7 @@ def execute(cfg):
     config_name = Path(running_config.job.config_name).stem
     ft_testbed = FTTestBed(config_name, cfg)
     
-    save_root=f"{proj_root}/evaluation_output_final/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{proj_root}/evaluation_output/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     if "Eval-wo-Update" in config_name:
         save_root += "_Eval-wo-Update"
     save_root += f"_lr={cfg.training.lr}"
@@ -787,18 +737,14 @@ def specificity(cfg):
     running_config = HydraConfig.get()
     config_name = Path(running_config.job.config_name).stem
     ft_testbed = FTTestBed(config_name, cfg)
-    # 
     ft_model = FinetunedCodeLlama(cfg)
 
     proj_root = os.path.dirname(__file__) + "/../.."
     
-    sampled_updates_ids = json.load(open(f"{proj_root}/evaluation_output_dedup/specificity/sampled_update_ids_new.json", "r"))
-    sampled_humaneval_task_ids = json.load(open(f"{proj_root}/evaluation_output_dedup/specificity/sampled_task_ids.json", "r"))
+    sampled_updates_ids = json.load(open(f"{proj_root}/data/sampled_update_ids.json", "r"))
+    sampled_humaneval_task_ids = json.load(open(f"{proj_root}/data/sampled_humaneval_task_ids.json", "r"))
     
-    
-    # save_root=f"{proj_root}/evaluation_output_final/specificity/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
-    # save_root=f"{proj_root}/evaluation_output_final/specificity/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
-    save_root=f"{proj_root}/evaluation_output_final/specificity/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    save_root=f"{proj_root}/evaluation_output/specificity/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     save_root += f"_lr={cfg.training.lr}"
         
     if not cfg.prompt.include_update:
@@ -820,10 +766,10 @@ def specificity_base(cfg):
 
     proj_root = os.path.dirname(__file__) + "/../.."
     
-    sampled_updates_ids = json.load(open(f"{proj_root}/evaluation_output_dedup/specificity/sampled_update_ids_new.json", "r"))
-    sampled_humaneval_task_ids = json.load(open(f"{proj_root}/evaluation_output_dedup/specificity/sampled_task_ids.json", "r"))
-
-    save_root=f"{proj_root}/evaluation_output_final/specificity_base/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
+    sampled_updates_ids = json.load(open(f"{proj_root}/data/sampled_update_ids.json", "r"))
+    sampled_humaneval_task_ids = json.load(open(f"{proj_root}/data/sampled_humaneval_task_ids.json", "r"))
+    
+    save_root=f"{proj_root}/evaluation_output/specificity_base/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     save_root += f"_lr={cfg.training.lr}"
     if not cfg.prompt.include_update:
         save_root += "_noUpdate"
@@ -843,8 +789,8 @@ def hyper_specificity(cfg):
 
     proj_root = os.path.dirname(__file__) + "/../.."
     
-    sampled_updates_ids = json.load(open(f"{proj_root}/evaluation_output_dedup/specificity/sampled_update_ids.json", "r"))
-    sampled_humaneval_task_ids = json.load(open(f"{proj_root}/evaluation_output_dedup/specificity/sampled_task_ids.json", "r"))
+    sampled_updates_ids = json.load(open(f"{proj_root}/data/sampled_update_ids.json", "r"))
+    sampled_humaneval_task_ids = json.load(open(f"{proj_root}/data/sampled_humaneval_task_ids.json", "r"))
     
     
     save_root=f"{proj_root}/hyper_search/specificity/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}_lr={cfg.training.lr}"
@@ -862,14 +808,12 @@ def hyper_search(cfg):
     running_config = HydraConfig.get()
     config_name = Path(running_config.job.config_name).stem
     ft_testbed = FTTestBed(config_name, cfg)
-    # 
-    # print()    
     ft_model = FinetunedCodeLlama(cfg)
 
     proj_root = os.path.dirname(__file__) + "/../.."
     
-    sampled_updates_ids = json.load(open(f"{proj_root}/evaluation_output_dedup/specificity/sampled_update_ids_new.json", "r"))
-    
+    sampled_updates_ids = json.load(open(f"{proj_root}/data/sampled_update_ids.json", "r"))
+
     save_root=f"{proj_root}/hyper_search/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}_lr={cfg.training.lr}"
     if not cfg.prompt.include_update:
         save_root += "_noUpdate"
@@ -894,14 +838,10 @@ def main(
         evaluate(cfg)
     elif cfg.usage == "rand_eval":
         rand_evaluate(cfg)
-    elif cfg.usage == "base_eval":
-        base_evaluate(cfg)
     elif cfg.usage == "exec":
         execute(cfg)
     elif cfg.usage == "rand_exec":
         rand_execute(cfg)
-    elif cfg.usage == "base_exec":
-        base_execute(cfg)
     elif cfg.usage == "specificity":
         specificity(cfg)
     elif cfg.usage == "specificity_base":
