@@ -34,20 +34,9 @@ from src.utils.code import (
     wrap_code_in_short_comment,
     UnitTestsReport
 )
+from src.utils.dataloader import decompose_id
 
-U_FILE_NAME = "update-content-w_ut.json"
-PS_FILE_NAME = "prog_syn-content-w_ut.json"
-proj_root = os.path.dirname(__file__) + "/../.."
-U_ROOT = f"{proj_root}/data/prelim/CodeUpdateArena-pre-PS"
-pilot_root_dir = f"{proj_root}/data/prelim/pilot_run/gpt-4"
-
-
-def decompose_id(identifier):
-    components = identifier.split(":")
-    assert all(len(c) >= 2 for c in components)
-    if all(c[0] == "[" and c[-1] == "]" for c in components):
-        components = [c[1:-1] for c in components]
-    return components
+PROJ_ROOT = os.path.dirname(__file__) + "/../.."
 
 def prepare_arena_dataset(cfg: DictConfig):    
     dataset = load_dataset(cfg.data.data_dir)["test"]
@@ -98,7 +87,6 @@ class TestBed:
         tested_function: Function,
         pass_criterion: Callable = lambda x, y: x and not y,
     ) -> CheckOutput:
-        # TODO: refactor unit test checker into a separate object?
         num_unit_tests = len(unit_tests)
         report = UnitTestsReport(num_unit_tests)
         report.tested_function = str(tested_function)
@@ -168,7 +156,6 @@ class TestBed:
         test_reports: List[UnitTestsReport],
         ks: List[int] = [1,2,5,10]
     ):
-        # eval_results = []
         
         def helper(helper_test_reports: List[UnitTestsReport], ks: List[int], program_api_usages: List[bool] = None):
             ret = {}
@@ -195,7 +182,6 @@ class TestBed:
                 for test_report in helper_test_reports 
             )
             for k in ks:
-                # ret[f"{prefix}_pass@{k}"] = np.nan if n == 0 or c > n else pass_at_k(n, c, k)
                 ret[f"{prefix}pass@{k}(new)"] = np.nan if n == 0 or c_new > n else pass_at_k(n, c_new, k) * 100
                 ret[f"{prefix}UPass@{k}"] = np.nan if n == 0 or c_new_excl > n else pass_at_k(n, c_new_excl, k) * 100
                 
@@ -207,11 +193,11 @@ class TestBed:
             ret[f"{prefix}accuracy_mean"] = np.mean(accuracies) * 100
             ret[f"{prefix}accuracy_std"] = np.std(accuracies) * 100
             unaffected = [
-                test_report.num_pass_w_update == test_report.num_pass_wo_update # and test_report.num_pass_wo_update > 0
+                test_report.num_pass_w_update == test_report.num_pass_wo_update
                 for test_report in helper_test_reports
             ]
             affected = [
-                test_report.num_pass_w_update != test_report.num_pass_wo_update # and test_report.num_pass_wo_update > 0
+                test_report.num_pass_w_update != test_report.num_pass_wo_update
                 for test_report in helper_test_reports
             ]
             ret[f"{prefix}unaffected"] = np.mean(unaffected) * 100
@@ -222,7 +208,6 @@ class TestBed:
         
         return {
             **general_agg_result,
-            # **restricted_agg_result,
         }
     
 class FTTestBed(TestBed):
@@ -241,15 +226,14 @@ class OneShotTestBed(TestBed):
         cache_prefix: str = "",
     ) -> None:
         super().__init__(cfg,)
-        self.proj_root = os.path.dirname(__file__) + "/../.."
+        self.proj_root = PROJ_ROOT
         self.dataset_dict = prepare_arena_dataset(cfg)
         self.test_dataset = self.dataset_dict["test"]
         assert self.cfg.prompt.num_few_shot_examples == 1, "Not one shot config"
         assert self.cfg.prompt.num_public_unit_tests == 1, "num_public_unit_tests != 1"
         set_random_seed(cfg.seed)
-        # self.rand_idx = 6 # np.random.choice(len(self.test_dataset))
-        # self.example_datum = self.test_dataset.pop(self.rand_idx)
-        self.example_datum = json.load(open(f"{proj_root}/data/example_datum.json", "r"))
+        
+        self.example_datum = json.load(open(f"{PROJ_ROOT}/data/example_datum.json", "r"))
         self.num_public_unit_tests = cfg.prompt.num_public_unit_tests
         
         self.cache_prefix = cache_prefix
@@ -261,7 +245,7 @@ class OneShotTestBed(TestBed):
     def prepare_prompt(self, datum):
         # add option to remove CoT in code
         solution_new = self.example_datum["prog_syn"]["ref_solution"]
-        # solution_new_no_comment = "\n".join([l for l in solution_new.split("\n") if not l.strip().startswith("#")])
+        
         prompt = self.prompt_template.render(
             # Update information
             old_function_signature=datum["update"]["old_signature"],
@@ -298,7 +282,6 @@ class OneShotTestBed(TestBed):
         self.cache = SQLiteCache(
             f"{self.proj_root}/caches/{cache_prefix}one_shot_test_bed"\
                 f"#pub-ut={self.num_public_unit_tests}_model={model.model_name}.sqlite"
-                    # f"inspection-dir={self.cfg.data.inspect_dir}"
         )
         
         self.cached_query_func = self.cache.cache_func(
@@ -326,7 +309,6 @@ class OneShotTestBed(TestBed):
         self._create_cache(model)
         os.makedirs(save_root, exist_ok=True)
         
-        # grouped_eval_results = defaultdict(list)
         for test_datum in tqdm(self.test_dataset[:]):
             prog_syn_id = test_datum["prog_syn_id"]
             save_dir = f"{save_root}/{prog_syn_id}/{model.model_name}"
@@ -343,11 +325,10 @@ class OneShotTestBed(TestBed):
         
     def execute_arena(self, save_root, model_name):
         print(f"Evaluating results from: {model_name}")
-        # grouped_eval_results = defaultdict(list)
+
         for test_datum in tqdm(self.test_dataset[:]):
             prog_syn_id = test_datum["prog_syn_id"]
             save_dir = f"{save_root}/{prog_syn_id}/{model_name}"
-            # print(f"Save dir: {save_dir}")
             assert os.path.exists(f"{save_dir}/generated_texts.json")
             
             generated_solutions = json.load(open(f"{save_dir}/generated_texts.json", "r"))
@@ -368,7 +349,6 @@ class OneShotTestBed(TestBed):
             unit_test_functions = [Function(unit_test) for unit_test in test_datum["prog_syn"]["unit_tests"]]
             test_reports = []
             for generated_program in generated_programs:
-                # assert generated_program, "Failed to extract generated_program"
                 test_report = self.check_unit_tests(
                     update_manager=u_manager, 
                     imports=test_datum["prog_syn"]["imports"], 
@@ -395,9 +375,8 @@ class OneShotTestBed(TestBed):
         grouped_eval_results = defaultdict(list)
         for test_datum in tqdm(self.test_dataset):
             test_prompt = self.prepare_prompt(test_datum)
-            # start = time()
             generated_solutions = self.cached_query_func(prompt=test_prompt)
-            # print(f"Generation time(s): {time() - start}s")
+            
             # extract solution code
             generated_programs = list(map(self.prompt_template.solution_extractor, generated_solutions))
             # create update manager
@@ -413,7 +392,6 @@ class OneShotTestBed(TestBed):
             start = time()
             # Execute each generated program
             for generated_program in generated_programs:
-                # assert generated_program, "Failed to extract generated_program"
                 test_report = self.cached_exec_func(
                     update_manager=u_manager, 
                     imports=test_datum["prog_syn"]["imports"], 
@@ -421,7 +399,7 @@ class OneShotTestBed(TestBed):
                     tested_function=generated_program,
                 )
                 test_reports.append(test_report.output)
-            # print(f"Execution time(s): {time() - start}s")
+
             individual_eval_results = self.aggregate_test_reports(u_manager, test_reports, generated_programs)
             api_path = test_datum["update"]["api_path"]
             update_type = test_datum["update"]["update_type"]
@@ -454,9 +432,7 @@ def generate_text(cfg):
     else:    
         prepend_model = PrependCodeLlama(cfg)
     
-    proj_root = os.path.dirname(__file__) + "/../.."
-    
-    test_bed.evaluate_arena(prepend_model, save_root=f"{proj_root}/evaluation_output/{exp_name}_n={cfg.evaluation.n_decoding_example}")
+    test_bed.evaluate_arena(prepend_model, save_root=f"{PROJ_ROOT}/evaluation_output/{exp_name}_n={cfg.evaluation.n_decoding_example}")
 
 def run_exec(cfg):
     running_config = HydraConfig.get()
@@ -472,7 +448,7 @@ def run_exec(cfg):
     model_name = os.path.basename(cfg.model.model_name_or_path)
     
     test_bed.execute_arena(
-        save_root=f"{proj_root}/evaluation_output/{exp_name}_n={cfg.evaluation.n_decoding_example}",
+        save_root=f"{PROJ_ROOT}/evaluation_output/{exp_name}_n={cfg.evaluation.n_decoding_example}",
         model_name=model_name,
     )
     

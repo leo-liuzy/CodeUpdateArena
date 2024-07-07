@@ -29,6 +29,7 @@ from src.utils.code import Function
 from src.utils.prompt import InstructTemplate
 from src.utils.eval import eval_on_humaneval
 from src.utils.utils import set_random_seed
+from src.utils.dataloader import decompose_id
 from src.test_beds.test_bed import TestBed
 from src.models.ft_model import FinetunedModel, FinetunedCodeLlama
 
@@ -61,13 +62,7 @@ def render(cfg, template, datum, example_datum, is_train):
         ),
         solution_code=datum["prog_syn"]["ref_solution"] if is_train else None,
     )
-    
-def decompose_id(identifier):
-    components = identifier.split(":")
-    assert all(len(c) >= 2 for c in components)
-    if all(c[0] == "[" and c[-1] == "]" for c in components):
-        components = [c[1:-1] for c in components]
-    return components
+
 
 def prepare_arena_dataset(cfg: DictConfig):    
     dataset = load_dataset(cfg.data.data_dir)["test"]
@@ -192,7 +187,7 @@ class FTTestBed(TestBed):
         logger.info(f"#Decoding per test: {self.num_decoding}")
         logger.info(f"N few-shot examples: {cfg.prompt.num_few_shot_examples}")
         
-        self.update_cfg = OmegaConf.load(f"{PROJ_ROOT}/configs/update_generation.yaml")
+        self.update_cfg = OmegaConf.load(f"{self.proj_root}/configs/update_generation.yaml")
         
         self.training_args = TrainingArguments(
             output_dir=cfg.output_dir,
