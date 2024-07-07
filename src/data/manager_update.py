@@ -426,7 +426,7 @@ class UpdateManager(Manager):
             json.dump(self.rejection_sample_stats, open(f"{save_dir}/rej_sample_stats{suffix}.json", "w"))
     
     def _sample_update_spec(self, save_dir):
-        from data.prelim.prompt_v2_update import (
+        from src.data.prompt_update import (
             update_spec_sys_prompt_template, update_spec_input_prompt_template,
         )
         self.update_sys_prompt = update_spec_sys_prompt_template.render(update_description=self.update_type.description)
@@ -477,10 +477,10 @@ class UpdateManager(Manager):
         return ret
     
     def _sample_unit_test_skeletons(self, save_dir,):
-        from data.prompt_update import (
+        from src.data.prompt_update import (
             unit_test_skeleton_sys_prompt_template, unit_test_skeleton_input_prompt_template,
         )
-        from data.prompt_package import PACKAGE2PROMPT_INPUT
+        from src.data.prompt_package import PACKAGE2PROMPT_INPUT
         max_rejection_sample = self.cfg.unit_test_skeletons.max_rej_sample
         num_unit_tests = self.cfg.unit_test_skeletons.num_unit_tests
         assert num_unit_tests == 10, "Wrong num_unit_tests in config"
@@ -545,8 +545,8 @@ class UpdateManager(Manager):
         save_dir,
     ) -> RejectionSampleOutput:
         
-        from data.prompt_update import unit_test_ans_sys_prompt_template, unit_test_ans_input_prompt_template
-        from data.prompt_package import PACKAGE2PROMPT_ANSWER
+        from src.data.prompt_update import unit_test_ans_sys_prompt_template, unit_test_ans_input_prompt_template
+        from src.data.prompt_package import PACKAGE2PROMPT_ANSWER
         
         self.unit_test_ans_sys_prompt = unit_test_ans_sys_prompt_template.render(
             function_name=self.updated_function.function_name,
@@ -610,8 +610,8 @@ class UpdateManager(Manager):
         save_dir,
     ) -> RejectionSampleOutput:
         
-        from data.prompt_update import unit_test_assert_sys_prompt_template, unit_test_assert_input_prompt_template
-        from data.prompt_package import PACKAGE2PROMPT_ASSERT
+        from src.data.prompt_update import unit_test_assert_sys_prompt_template, unit_test_assert_input_prompt_template
+        from src.data.prompt_package import PACKAGE2PROMPT_ASSERT
         self.unit_test_ans_sys_prompt = unit_test_assert_sys_prompt_template.render(
             # function_name=self.updated_function.function_name,
             # old_function_signature=self.updated_function.function_signature,
@@ -669,7 +669,7 @@ class UpdateManager(Manager):
         save_dir,
         rerun_exec=False,
     ) -> RejectionSampleOutput:
-        from data.prompt_update import (
+        from src.data.prompt_update import (
             new_impl_sys_prompt_template, new_impl_input_prompt_template,
         )
         from copy import deepcopy
@@ -863,7 +863,7 @@ class UpdateManager(Manager):
         open(f"{save_dir}/{file_name}", "w").write("\n\n".join(debugging_files))
     
     def _sample_imports(self, code, code_name, save_dir=None):
-        from data.prompt_update import import_sys_prompt_template, import_input_prompt_template
+        from src.data.prompt_update import import_sys_prompt_template, import_input_prompt_template
         self.import_sys_prompt = import_sys_prompt_template.render()
         tmp = import_input_prompt_template.render(code=code)
         if hasattr(self, "import_input_prompt"):
@@ -1112,7 +1112,7 @@ class UpdateManager(Manager):
         
 if __name__ == "__main__":
     
-    os.chdir(os.path.dirname(__file__)) # "./data/prelim"
+    os.chdir(os.path.dirname(__file__)) 
     cur_dir = os.getcwd()
     print(f"Current working dir: {cur_dir}")
     save_root = "<path to save directory>"

@@ -8,7 +8,6 @@ from omegaconf import OmegaConf
 import pickle
 import numpy as np
 
-from src.data.manager_update import Manager, UpdateManager
 from src.utils.update import Action, Aspect, Place, UpdatedFunction, UpdateType
 from src.utils.code import (
     CheckErrorType, CheckOutput,
@@ -19,6 +18,7 @@ from src.utils.code import (
 )
 from src.utils.utils import call_openai_chat, OPENAI_MODEL
 from src.data.prompt_update import PYTHON_INDENT
+from src.data.manager_update import Manager, UpdateManager
 
 
 CLIENT = OpenAI()
@@ -108,7 +108,7 @@ class ProgSynManager(Manager):
         return ret
         
     def _sample_prog_syn_spec(self, save_dir):
-        from data.prelim.prompt_v2_prog_syn import (
+        from src.data.prompt_prog_syn import (
             prog_syn_sys_prompt_template, prog_syn_input_prompt_template,
         )
         # TODO: adapt
@@ -165,7 +165,7 @@ class ProgSynManager(Manager):
         return ret
     
     def _sample_unit_test_skeletons(self, save_dir,):
-        from data.prelim.prompt_v2_prog_syn import (
+        from src.data.prompt_prog_syn import (
             unit_test_skeleton_sys_prompt_template, unit_test_skeleton_input_prompt_template,
         )
         
@@ -248,8 +248,8 @@ class ProgSynManager(Manager):
         save_dir,
     ) -> RejectionSampleOutput:
         
-        from data.prelim.prompt_v2_prog_syn import unit_test_ans_sys_prompt_template, unit_test_ans_input_prompt_template
-        from data.prelim.prompt_package import PACKAGE2PROMPT_ANSWER
+        from src.data.prompt_prog_syn import unit_test_ans_sys_prompt_template, unit_test_ans_input_prompt_template
+        from src.data.prompt_package import PACKAGE2PROMPT_ANSWER
         
         self.unit_test_ans_sys_prompt = unit_test_ans_sys_prompt_template.render(
             scenario=self.prog_syn_dict["scenario"],
@@ -315,8 +315,8 @@ class ProgSynManager(Manager):
     ) -> RejectionSampleOutput:
         pass
         
-        from data.prelim.prompt_v2_prog_syn import unit_test_assert_sys_prompt_template, unit_test_assert_input_prompt_template
-        from data.prelim.prompt_package import PACKAGE2PROMPT_ASSERT
+        from src.data.prompt_prog_syn import unit_test_assert_sys_prompt_template, unit_test_assert_input_prompt_template
+        from src.data.prompt_package import PACKAGE2PROMPT_ASSERT
         self.unit_test_ans_sys_prompt = unit_test_assert_sys_prompt_template.render(
             # function_name=self.updated_function.function_name,
             # old_function_signature=self.updated_function.function_signature,
@@ -456,7 +456,8 @@ class ProgSynManager(Manager):
             json.dump(self.rejection_sample_stats, open(f"{save_dir}/rej_sample_stats{suffix}.json", "w"))
     
     def _sample_imports(self, code, code_name, save_dir=None):
-        from data.prelim.prompt_v2_update import import_sys_prompt_template, import_input_prompt_template
+        from src.data.prompt_update import import_sys_prompt_template, import_input_prompt_template
+        
         self.import_sys_prompt = import_sys_prompt_template.render()
         tmp = import_input_prompt_template.render(code=code)
         if hasattr(self, "import_input_prompt"):
@@ -504,7 +505,7 @@ class ProgSynManager(Manager):
         save_dir,
         rerun_exec=False,
     ) -> RejectionSampleOutput:
-        from data.prelim.prompt_v2_prog_syn import (
+        from src.data.prompt_prog_syn import (
             solution_new_sys_prompt_template, solution_new_input_prompt_template,
         )
         from copy import deepcopy
@@ -785,7 +786,7 @@ class ProgSynManager(Manager):
 
 
 if __name__ == "__main__":
-    os.chdir(os.path.dirname(__file__)) # "./data/prelim"
+    os.chdir(os.path.dirname(__file__))
     cur_dir = os.getcwd()
     print(f"Current working dir: {cur_dir}")
     update_save_root = "<path to update save directory>"
@@ -793,13 +794,13 @@ if __name__ == "__main__":
     update_type_tag = "modify-function-name"
     update_save_dir = f"{update_save_root}/{api_path}/{update_type_tag}/update-0"
     print(f"Update save dir: {update_save_dir}")
-    update_cfg = OmegaConf.load("configs/update_generation_v2-1.yaml")
+    update_cfg = OmegaConf.load("configs/update_generation.yaml")
     update_cfg.new_impl.include_unit_tests=True
     u_manager = UpdateManager(cfg=update_cfg, api_path=api_path, update_tag=update_type_tag)
     
     # u_manager.generate_and_initialize(save_dir=update_save_dir,)
     u_manager.load_from_dir(save_dir=update_save_dir,)
-    progsyn_cfg = OmegaConf.load("configs/prog_syn_generation_v2-1.yaml")
+    progsyn_cfg = OmegaConf.load("configs/prog_syn_generation.yaml")
     ps_manager = ProgSynManager(
         cfg=progsyn_cfg, 
         update_manager=u_manager,

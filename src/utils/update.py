@@ -15,8 +15,6 @@ from bigtree import Node
 from openai import AsyncOpenAI, OpenAI
 import sys
 
-# from src.execution.safe_execution_util import execute
-# from data.prelim.prompt import doc_summarization_prompt
 from src.utils.utils import call_openai_chat
 from src.data.prompt_update import PYTHON_INDENT, doc_summarization_prompt, arguments_writer_sys_prompt, arguments_writer_input_prompt
 from src.utils.code import concat_and_exec
