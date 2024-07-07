@@ -4,7 +4,10 @@
 
 Please check out our work [TBD] 📃
 
-![Dataset overview](./images/dataset-overview.png)
+<picture>
+<img src="./images/dataset-overview.png" alt="Dataset overview"/>
+</picture>
+<br/>
 
 ## Description
 
@@ -33,15 +36,21 @@ The *goal* of our benchmark is to update an LLM to be able to solve this program
 </p>
 </picture>
 
+<picture>
 <img src="./images/demographics-by-update.png" alt="Demographics by update type"/>
+</picture>
 
 <br/>
 
+<picture>
 <img src="./images/dataset-size.png" alt="Size"/>
+</picture>
 
 <br/>
 
+<picture>
 <img src="./images/dataset-token-stats.png" alt="Token statistics"/>
+</picture>
 
 <br/>
 
@@ -50,7 +59,9 @@ The *goal* of our benchmark is to update an LLM to be able to solve this program
 
 ## Synthetic Data Generation
 
+<picture>
 <img src="./images/generation-pipeline.png" alt="Generation pipeline"/>
+</picture>
 
 **Check out the details in our paper!**
 
