@@ -1,6 +1,6 @@
 # `CodeUpdateArena`: Benchmarking Knowledge Editing on API Updates
 
-Authors: Zeyu Leo Liu, Shrey Pandit, Xi Ye, Eunsol Choi, Greg Durrett
+**Authors**: Zeyu Leo Liu, Shrey Pandit, Xi Ye, Eunsol Choi, Greg Durrett
 
 Please check out our work [TBD] 📃
 
