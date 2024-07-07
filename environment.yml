@@ -1,4 +1,4 @@
-name: tool-ke
+name: code-update-arena
 channels:
   - conda-forge
   - defaults
