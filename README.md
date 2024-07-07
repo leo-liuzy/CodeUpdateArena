@@ -53,14 +53,13 @@ The *goal* of our benchmark is to update an LLM to be able to solve this program
 
 **Check out the details in our paper!**
 
-We provide bash script to run experiment in [src/data](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/src/data) directory. The core scripts are `manager_update.py` and `manager_prog_syn.py`, who are pipelines to generate update and program synthesis respectively. Both script follows similar generation procedure but uses different sets of prompts.
-
+We provide code for dataset generation in [src/data](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/src/data) directory. The core scripts are `manager_update.py` and `manager_prog_syn.py`, which are pipelines to generate update and program synthesis respectively. Both script follows similar generation procedure but uses different sets of prompts.
 
 We also include the core code to automatically de-duplicate generated program synthesis examples. See `auto-dedup.py` in `scripts` directory.
 
 ## Reproducing knowledge editing baselines
 
-We provide bash script to run experiment in [script](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/scripts) directory. We **highly recommend** running code to [predict solution] and [execute solution] separately. We left more comment for how to use the script.
+We provide bash script to run experiment in [script](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/scripts) directory. We **highly recommend** running code to predict solution (e.g. `usage=eval`) and (e.g. `usage=exec`) separately. In each script, we left comments on how to use it.
 
 ## Citation
 
