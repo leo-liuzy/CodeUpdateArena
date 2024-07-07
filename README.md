@@ -27,10 +27,11 @@ The *goal* of our benchmark is to update an LLM to be able to solve this program
 
 
 ### Dataset statistics
+<picture>
 <p align="center">
   <img src="./images/demographics-by-package.png" alt="Demographics by package" width="50%" />
 </p>
-
+</picture>
 
 <img src="./images/demographics-by-update.png" alt="Demographics by update type"/>
 
