@@ -7,7 +7,7 @@ defaults:
   - _self_
 
 model:
-  model_name_or_path: # hf model id or path to model
+  model_name_or_path: gpt-4 # hf model id or path to model
 
 data:
   data_dir: leo-liuzy/CodeUpdateArena

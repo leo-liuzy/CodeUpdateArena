@@ -260,6 +260,7 @@ class FTTestBed(TestBed):
         
             # refresh peft for next edit
             ft_model.refresh()
+            exit(0)
     
     def evaluate_arena_w_random_update(
         self, 
@@ -279,7 +280,11 @@ class FTTestBed(TestBed):
         update2u_datasets = {
             k: sorted(
                 vs, 
-                key=lambda x: int(x["test"][0]["prog_syn_id"].split("-")[-1])
+                key=lambda x: int(
+                    decompose_id(
+                        x["test"][0]["prog_syn_id"]
+                    )[-1].split("-")[-1]
+                )
             )
             for k, vs in update2u_datasets.items()
         }
@@ -327,6 +332,7 @@ class FTTestBed(TestBed):
         
             # refresh peft for next edit
             ft_model.refresh()
+            exit(0)
 
     def evaluate_arena_specificity(
         self, 
@@ -346,7 +352,11 @@ class FTTestBed(TestBed):
         update2u_datasets = {
             k: sorted(
                 vs, 
-                key=lambda x: int(x["test"][0]["prog_syn_id"].split("-")[-1])
+                key=lambda x: int(
+                    decompose_id(
+                        x["test"][0]["prog_syn_id"]
+                    )[-1].split("-")[-1]
+                )
             )
             for k, vs in update2u_datasets.items()
         }
@@ -389,6 +399,7 @@ class FTTestBed(TestBed):
         
             # refresh peft for next edit
             ft_model.refresh()
+            exit(0)
     
     def execute_arena(self, save_root, model_name):
         print(f"Evaluating results from: {model_name}")
@@ -443,70 +454,8 @@ class FTTestBed(TestBed):
                 eval_result["specific_update_id"] = test_datum["specific_update_id"]
                 eval_result["prog_syn_id"] = test_datum["prog_syn_id"]
                 json.dump(eval_result, open(f"{save_dir}/eval_result.json", "w"))
-        
-    
-    def evaluate(self, ft_model: FinetunedModel, run_exec: bool = False):
-        dfs = []
-        
-        for u_i, (u_name, u_dataset) in tqdm(enumerate(self.named_dataset)):
-            # go through every test instances
-            assert u_dataset["test"].num_rows > 0
-            max_token_instance = max(len(ft_model.tokenizer(r['text'])['input_ids']) for r in u_dataset['train'])
-            logger.info(f"Max #token / instance in train: {max_token_instance}")
-            
-            # Initialize the trainer and train
+                exit(0)
 
-            trainer = self.get_trainer(u_dataset, ft_model)
-            trainer.train()
-            
-            
-            u_eval_results = []
-            n_test = u_dataset["test"].num_rows
-            for test_i in tqdm(range(n_test), desc=f"{u_i}th update eval"):
-                logger.info(f"Evaluating {test_i} / {n_test} of {u_i}th update eval")
-                test_datum = u_dataset["test"][test_i]
-                
-                # generate with finetuned model and extract solution
-                generated_texts = ft_model.generate_solutions(test_datum["text"])
-                generated_programs = list(map(InstructTemplate.solution_extractor, generated_texts))
-                
-                individual_eval_results = self.evaluate_generated_programs(generated_programs, test_datum, run_exec)
-                individual_eval_results["trainer_logs"] = trainer.state.log_history
-                individual_eval_results["generated_texts"] = generated_texts
-                u_eval_results.append(individual_eval_results)
-            
-            # record eval results for 1 update
-            df = pd.DataFrame(u_eval_results)
-            dfs.append(df)
-            pickle.dump(dfs, open(f"{self.output_dir}/dfs_w{'' if run_exec else 'o'}_exec.pkl", "wb"))
-            # prepare ft model for training on next update
-            ft_model.refresh()
-        logger.info(f"Result saved to {self.output_dir}")
-        
-    def evaluate_generated_programs(self, generated_programs: List[str], datum: Dict, run_exec: bool = False):
-        eval_results = {}
-        
-        if run_exec:
-            u_manager = UpdateManager(cfg=self.update_cfg, api_path=datum["update"]["api_path"], update_tag=datum["update"]["update_type"])
-            u_manager.load_from_dict(datum["update"])
-
-            # Run every program against unit tests
-            unit_test_functions = [Function(unit_test) for unit_test in datum["prog_syn"]["unit_tests"]]
-            test_reports = []
-            for generated_program in generated_programs:
-                if generated_program is None:
-                    generated_program = ""
-                test_report = self.check_unit_tests(update_manager=u_manager, imports=datum["prog_syn"]["imports"], unit_tests=unit_test_functions, tested_function=generated_program,)
-                test_reports.append(test_report.output)
-            eval_results = self.aggregate_test_reports(test_reports)
-        # record
-        eval_results["text"] = datum["text"]
-        eval_results["generated_programs"] = generated_programs
-        eval_results["api_path"] = datum["update"]["api_path"]
-        eval_results["update_type"] = datum["update"]["update_type"]
-        eval_results["update_id"] = datum["update"]["identifier"]
-        eval_results["identifier"] = datum["identifier"]
-        return eval_results
 
 def evaluate(cfg):
     running_config = HydraConfig.get()
@@ -596,7 +545,7 @@ def specificity(cfg):
     
     save_root=f"{PROJ_ROOT}/evaluation_output/specificity/FT-{cfg.data.training_example_per_update}_n={cfg.evaluation.n_decoding_example}"
     save_root += f"_lr={cfg.training.lr}"
-        
+    
     if not cfg.prompt.include_update:
         save_root += "_noUpdate"
     

@@ -1,0 +1,8 @@
+[INST]
+Update note:
+There's an recent update to a function `math.sin(x,/):` --- Update the math.sin function to accept angle in degrees rather than radians.. The function now has a new function signature --- `math.sin(x, unit='radians')`.
+Here's a detailed documentation about the update:
+[DOC]
+The updated function now accepts an optional second argument 'unit'. It represents the unit of measurement for the angle. It can take two values: 'radians' (default) and 'degrees'. If 'unit' is 'radians', the function behaves exactly as before, returning the sine of `x` measured in radians. If 'unit' is 'degrees', then the function will first convert the input angle from degrees to radians, by multiplying it with π/180, and then return the sine of the angle. Note: the function will raise a ValueError if 'unit' is anything other than 'radians' or 'degrees'.
+[/DOC]
+[/INST]

@@ -65,7 +65,7 @@ class ProgSynManager(Manager):
                 assert isinstance(unit_test, Function)
                 program_in_section = [
                     self.imports,
-                    str(self.update_manager.new_impl),
+                    str(self.update_manager.implementation),
                     str(tested_function),  # TODO: make update_enforce_statement before tested_function
                     # enforce / introduce function update to package
                     update_enforce_statement,
@@ -117,10 +117,10 @@ class ProgSynManager(Manager):
             package_name = self.updated_function.package_name,
             api_path=self.updated_function.full_path,
             old_func=self.updated_function.function_signature,
-            update_description=self.update_manager.update_description,
+            update_description=self.update_manager.description,
             update_rationale=self.update_manager.rationale,
-            docstring_diff=self.update_manager.update_docstring,
-            new_function_signature=self.update_manager.new_function_signature,
+            docstring_diff=self.update_manager.docstring,
+            new_function_signature=self.update_manager.signature,
             num_param=self.num_params,
         )
         self._record_prompt(
@@ -263,7 +263,7 @@ class ProgSynManager(Manager):
         infill_content = None
         old_function_signature = self.updated_function.function_signature
         old_function_signature = old_function_signature.replace(f"{self.updated_function.parent_path}.", "old_")
-        new_function_signature = self.update_manager.new_function_signature
+        new_function_signature = self.update_manager.signature
         for rj_i in range(max_rejection_sample):
             try:
                 response_name = f"answer_response-{rj_i}.json"
@@ -273,7 +273,7 @@ class ProgSynManager(Manager):
                     include_api_info=True,
                     old_function_signature=old_function_signature,
                     new_function_signature=new_function_signature,
-                    update_docstring=self.update_manager.update_docstring,
+                    update_docstring=self.update_manager.docstring,
                     # package-specific addition
                     package_name=self.updated_function.package_name,
                     package_instruct=PACKAGE2PROMPT_ANSWER[self.updated_function.full_path],
@@ -398,7 +398,7 @@ class ProgSynManager(Manager):
             "\n".join([f"""# "{k}": {v}"""
                         for k, v in tmp]),
             self.imports,
-            str(self.update_manager.new_impl),
+            str(self.update_manager.implementation),
             self.update_manager.update_enforce_statement,
             str(self.solution_new),
             # enforce / introduce function update to package
@@ -510,7 +510,7 @@ class ProgSynManager(Manager):
         )
         from copy import deepcopy
         
-        new_func_sign = self.update_manager.new_function_signature
+        new_func_sign = self.update_manager.signature
         # new_func_sign_wo_full_ref = new_func_sign.replace(
         #     f"{self.updated_function.parent_path}.", ""
         # )
@@ -522,9 +522,9 @@ class ProgSynManager(Manager):
         # renamed_old_func_sign = old_func_sign.replace(f"{self.updated_function.parent_path}.", "old_")
         self.solution_new_sys_prompt = solution_new_sys_prompt_template.render(
             old_function_signature=old_func_sign,
-            update_description=self.update_manager.update_description,
+            update_description=self.update_manager.description,
             new_function_signature=new_func_sign,
-            update_docstring=self.update_manager.update_docstring,
+            update_docstring=self.update_manager.docstring,
         )
         
         random_index = np.sort(np.random.choice(range(len(self.unit_tests_str)), size=len(self.unit_tests_str), replace=False))

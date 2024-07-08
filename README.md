@@ -71,7 +71,7 @@ We also include the core code to automatically de-duplicate generated program sy
 
 ## Reproducing knowledge editing baselines
 
-We provide bash script to run experiment in [script](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/scripts) directory. We **highly recommend** running code to predict solution (e.g. `usage=eval`) and (e.g. `usage=exec`) separately. In each script, we left comments on how to use it.
+We provide bash script to run experiment in [scripts](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/scripts) directory. We **highly recommend** running code to predict solution (e.g. `usage=eval`) and (e.g. `usage=exec`) separately. In each script, we left comments on how to use it.
 
 ## Citation
 

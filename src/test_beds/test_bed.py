@@ -67,7 +67,7 @@ def prepare_arena_dataset(cfg: DictConfig):
             "prog_syn_id": prog_syn_id,
             "package": api_path.split(".")[0]
         })
-    return {"test": dataset}
+    return {"test": prorcessed_dataset}
 
 
 class TestBed:
@@ -106,7 +106,7 @@ class TestBed:
                         "Import statement(s)",
                     ),
                     wrap_code_in_short_comment(
-                        str(update_manager.new_impl),
+                        str(update_manager.implementation),
                         "Updated API implementation",
                     ),
                     # enforce / introduce function update to package
@@ -309,7 +309,7 @@ class OneShotTestBed(TestBed):
         self._create_cache(model)
         os.makedirs(save_root, exist_ok=True)
         
-        for test_datum in tqdm(self.test_dataset[:]):
+        for test_datum in tqdm(self.test_dataset):
             prog_syn_id = test_datum["prog_syn_id"]
             save_dir = f"{save_root}/{prog_syn_id}/{model.model_name}"
             logger.info(f"Save to : {save_dir}")
@@ -326,7 +326,7 @@ class OneShotTestBed(TestBed):
     def execute_arena(self, save_root, model_name):
         print(f"Evaluating results from: {model_name}")
 
-        for test_datum in tqdm(self.test_dataset[:]):
+        for test_datum in tqdm(self.test_dataset):
             prog_syn_id = test_datum["prog_syn_id"]
             save_dir = f"{save_root}/{prog_syn_id}/{model_name}"
             assert os.path.exists(f"{save_dir}/generated_texts.json")
@@ -358,63 +358,14 @@ class OneShotTestBed(TestBed):
                 test_reports.append(test_report.output)
             pickle.dump(test_reports, open(f"{save_dir}/test_reports.pkl", "wb"))
             
-            eval_result = self.aggregate_test_reports(u_manager, test_reports, generated_programs)
+            eval_result = self.aggregate_test_reports(test_reports)
             eval_result["api_path"] = test_datum["update"]["api_path"]
             eval_result["update_type"] = test_datum["update"]["update_type"]
             eval_result["package"] = test_datum["package"]
             eval_result["specific_update_id"] = test_datum["specific_update_id"]
             eval_result["prog_syn_id"] = test_datum["prog_syn_id"]
             json.dump(eval_result, open(f"{save_dir}/eval_result.json", "w"))
-            
-    
-    def evaluate(self, model: PrependModel) -> pd.DataFrame:
-        
-        self._create_cache(model)
-        
-        eval_results = []
-        grouped_eval_results = defaultdict(list)
-        for test_datum in tqdm(self.test_dataset):
-            test_prompt = self.prepare_prompt(test_datum)
-            generated_solutions = self.cached_query_func(prompt=test_prompt)
-            
-            # extract solution code
-            generated_programs = list(map(self.prompt_template.solution_extractor, generated_solutions))
-            # create update manager
-            u_manager = UpdateManager(
-                cfg=self.update_cfg, 
-                api_path=test_datum["update"]["api_path"], 
-                update_tag=test_datum["update"]["update_type"]
-            )
-            u_manager.load_from_dict(test_datum["update"])
-            
-            unit_test_functions = [Function(unit_test) for unit_test in test_datum["prog_syn"]["unit_tests"]]
-            test_reports = []
-            start = time()
-            # Execute each generated program
-            for generated_program in generated_programs:
-                test_report = self.cached_exec_func(
-                    update_manager=u_manager, 
-                    imports=test_datum["prog_syn"]["imports"], 
-                    unit_tests=unit_test_functions, 
-                    tested_function=generated_program,
-                )
-                test_reports.append(test_report.output)
 
-            individual_eval_results = self.aggregate_test_reports(u_manager, test_reports, generated_programs)
-            api_path = test_datum["update"]["api_path"]
-            update_type = test_datum["update"]["update_type"]
-            update_id = test_datum["update"]["identifier"]
-            
-            individual_eval_results["api_path"] = api_path
-            individual_eval_results["update_type"] = update_type
-            individual_eval_results["update_id"] = update_id
-            individual_eval_results["identifier"] = test_datum["identifier"]
-            eval_results.append(individual_eval_results)
-            grouped_eval_results[f"{api_path}/{update_type}/{update_id}"].append(individual_eval_results)
-        
-        df = pd.DataFrame(eval_results)
-        grouped_df = {k: pd.DataFrame(vs) for k, vs in grouped_eval_results.items()}
-        return df, grouped_df
     
 def generate_text(cfg):
     running_config = HydraConfig.get()

@@ -448,8 +448,8 @@ class UpdateManager(Manager):
         error_messages = []
         update_spec_dict = None
         update_spec_dict_keys = [
-            "update_description", "rationale", 
-            "new_function_signature", "update_docstring",
+            "description", "rationale", 
+            "signature", "docstring",
         ]
         for rj_i in range(max_rejection_sample):
             try:
@@ -487,14 +487,14 @@ class UpdateManager(Manager):
         
         self.unit_test_skeleton_sys_prompt = unit_test_skeleton_sys_prompt_template.render(
             old_function_signature=self.updated_function.function_signature,
-            update_description=self.update_dict["update_description"],
-            new_function_signature=self.update_dict["new_function_signature"],
+            update_description=self.update_dict["description"],
+            new_function_signature=self.update_dict["signature"],
             num_unit_tests=num_unit_tests,
             function_name=self.updated_function.function_name,
             full_api_path=self.updated_function.full_path,
         )
         self.unit_test_skeleton_input_prompt = unit_test_skeleton_input_prompt_template.render(
-            update_docstring=self.update_dict["update_docstring"], 
+            update_docstring=self.update_dict["docstring"], 
             # package-specific addition
             package_name=self.updated_function.package_name,
             package_instruct=PACKAGE2PROMPT_INPUT[self.updated_function.full_path],
@@ -551,8 +551,8 @@ class UpdateManager(Manager):
         self.unit_test_ans_sys_prompt = unit_test_ans_sys_prompt_template.render(
             function_name=self.updated_function.function_name,
             old_function_signature=self.updated_function.function_signature,
-            update_description=self.update_dict["update_description"],
-            new_function_signature=self.update_dict["new_function_signature"],
+            update_description=self.update_dict["description"],
+            new_function_signature=self.update_dict["signature"],
         )
         max_rejection_sample=self.cfg.unit_test_answer.max_rej_sample
         ret = RejectionSampleOutput(name=f"unit_test_answer-{unit_test_i}", max_rejection_sample=max_rejection_sample)
@@ -565,7 +565,7 @@ class UpdateManager(Manager):
                 response_name = f"answer_response-{rj_i}.json"
                 
                 unit_test_answer_input_prompt_i = unit_test_ans_input_prompt_template.render(
-                    update_docstring=self.update_dict["update_docstring"], 
+                    update_docstring=self.update_dict["docstring"], 
                     unit_test_skeleton=unit_test_skeleton,
                     function_name=self.updated_function.function_name,
                     # package-specific addition
@@ -612,12 +612,7 @@ class UpdateManager(Manager):
         
         from src.data.prompt_update import unit_test_assert_sys_prompt_template, unit_test_assert_input_prompt_template
         from src.data.prompt_package import PACKAGE2PROMPT_ASSERT
-        self.unit_test_ans_sys_prompt = unit_test_assert_sys_prompt_template.render(
-            # function_name=self.updated_function.function_name,
-            # old_function_signature=self.updated_function.function_signature,
-            # update_description=self.update_dict["update_description"],
-            # new_function_signature=self.update_dict["new_function_signature"],
-        )
+        self.unit_test_ans_sys_prompt = unit_test_assert_sys_prompt_template.render()
         max_rejection_sample=self.cfg.unit_test_answer.max_rej_sample
         ret = RejectionSampleOutput(name=f"unit_test_assert-{unit_test_i}", max_rejection_sample=max_rejection_sample)
         error_messages = []
@@ -674,11 +669,11 @@ class UpdateManager(Manager):
         )
         from copy import deepcopy
         
-        new_func_sign = self.new_function_signature
-        if self.updated_function.parent_path not in self.new_function_signature:
-            assert self.updated_function.function_name in self.new_function_signature, \
-            "sample_new_impl: function name not in self.new_function_signature"
-            new_func_sign = f"{self.updated_function.parent_path}.{self.new_function_signature}"
+        new_func_sign = self.signature
+        if self.updated_function.parent_path not in self.signature:
+            assert self.updated_function.function_name in self.signature, \
+            "sample_new_impl: function name not in self.signature"
+            new_func_sign = f"{self.updated_function.parent_path}.{self.signature}"
         # new_func_sign_wo_full_ref = new_func_sign.replace(
         #     f"{self.updated_function.parent_path}.", ""
         # )
@@ -690,7 +685,7 @@ class UpdateManager(Manager):
         renamed_old_func_sign = old_func_sign.replace(f"{self.updated_function.parent_path}.", "old_")
         self.new_impl_sys_prompt = new_impl_sys_prompt_template.render(
             old_function_signature=old_func_sign,
-            update_description=self.update_description,
+            update_description=self.description,
             new_function_signature=new_func_sign,
             renamed_old_function_signature=renamed_old_func_sign,
             function_name=self.updated_function.function_name,
@@ -699,7 +694,7 @@ class UpdateManager(Manager):
         
         random_index = np.sort(np.random.choice(range(len(self.unit_tests_str)), size=len(self.unit_tests_str), replace=False))
         self.new_impl_input_prompt = new_impl_input_prompt_template.render(
-            update_docstring=self.update_docstring,
+            update_docstring=self.docstring,
             unit_tests=[self.unit_tests_str[i] for i in random_index],
         )
         base_name = "new_impl"
@@ -738,7 +733,7 @@ class UpdateManager(Manager):
                 assert len(new_impl.strip()) > 0, "sample_new_impl: extracted empty string"
                 # TODO truncate everything before def
                 new_impl = self.remove_leading_imports(new_impl)
-                self.new_impl: Function = Function(wrap_code_in_short_comment(
+                self.implementation: Function = Function(wrap_code_in_short_comment(
                     new_impl, 
                     "New function implementation",
                     )
@@ -746,7 +741,7 @@ class UpdateManager(Manager):
                 enforcement_output = self.get_update_statements(
                     self.update_type, 
                     self.updated_function,
-                    self.new_impl
+                    self.implementation
                 )
                 assert enforcement_output.check_pass, "sample_new_impl: Failed to generate statement to enforce update"
                 
@@ -774,7 +769,7 @@ class UpdateManager(Manager):
                 if os.path.exists(exec_result_file) and not rerun_exec:
                     unit_tests_exec_check = pickle.load(open(exec_result_file, "rb"))
                 else:
-                    unit_tests_exec_check = self.check_unit_tests(self.new_impl)
+                    unit_tests_exec_check = self.check_unit_tests(self.implementation)
                     pickle.dump(unit_tests_exec_check, open(exec_result_file, "wb"))
                     open(
                         f"{rj_i_save_dir}/unit_tests_report.txt","w").write(
@@ -800,11 +795,11 @@ class UpdateManager(Manager):
         # TODO: add a step to remove failed unit tests, w/ high prob those are bad ones.
         ret.output = {
             "imports": best_imports,
-            "new_impl": best_new_impl,
+            "implementation": best_new_impl,
             "unit_tests_exec_check": unit_tests_exec_check,
         }
         
-        self.new_impl: Function = Function(wrap_code_in_short_comment(
+        self.implementation: Function = Function(wrap_code_in_short_comment(
             best_new_impl,
             "New function implementation",
             )
@@ -816,7 +811,7 @@ class UpdateManager(Manager):
         enforcement_output = self.get_update_statements(
             self.update_type, 
             self.updated_function,
-            self.new_impl
+            self.implementation
         )
         self.update_enforce_statement = wrap_code_in_short_comment(
             enforcement_output.output,
@@ -853,7 +848,7 @@ class UpdateManager(Manager):
             "\n".join([f"""# "{k}": {v}"""
                         for k, v in tmp]),
             self.imports,
-            str(self.new_impl),
+            str(self.implementation),
             # enforce / introduce function update to package
             self.update_enforce_statement,
             "# Unit tests",
@@ -907,15 +902,12 @@ class UpdateManager(Manager):
         return ret
     
     def load_from_dict(self, update_dict):
-        for k in ['update_description', 'rationale', 'new_function_signature', 'update_docstring', 'unit_test_skeletons', 'answer_infills', 'assert_infills', 'unit_tests', 'unit_tests_pass_w_update', 'imports', 'new_impl']:
+        for k in ['description', 'rationale', 'signature', 'docstring', 'unit_tests', 'imports', 'implementation']:
             assert k in update_dict
-        self.update_description = update_dict["update_description"]
+        self.description = update_dict["description"]
         self.rationale = update_dict["rationale"]
-        self.new_function_signature = update_dict["new_function_signature"]
-        self.update_docstring = update_dict["update_docstring"]
-        self.unit_test_skeletons = update_dict["unit_test_skeletons"]
-        self.answer_infills = update_dict["answer_infills"]
-        self.assert_infills = update_dict["assert_infills"]
+        self.signature = update_dict["signature"]
+        self.docstring = update_dict["docstring"]
         self.unit_tests_str = update_dict["unit_tests"]
         self.unit_tests : List[Function] = [
             Function(
@@ -924,22 +916,21 @@ class UpdateManager(Manager):
             for t_i, t in enumerate(self.unit_tests_str)
         ]
         self.num_unit_tests = len(self.unit_tests)
-        self.unit_tests_pass_w_update = update_dict["unit_tests_pass_w_update"]
         self.import_lst = update_dict["imports"]
         self.imports = wrap_code_in_short_comment(
             "\n".join(self.sort_imports(self.import_lst)),
             "Import statement(s)",
         )
         
-        self.new_impl: Function = Function(wrap_code_in_short_comment(
-            update_dict["new_impl"],
+        self.implementation: Function = Function(wrap_code_in_short_comment(
+            update_dict["implementation"],
             "New function implementation",
             )
         )
         enforcement_output = self.get_update_statements(
             self.update_type, 
             self.updated_function,
-            self.new_impl
+            self.implementation
         )
         assert enforcement_output.check_pass, "Update_init: Failed to generate statement to enforce update"
         self.update_enforce_statement = wrap_code_in_short_comment(
@@ -1082,7 +1073,6 @@ class UpdateManager(Manager):
         
         ######################### START: generate new_impl #########################
         # Now treating unit tests as "gold"
-        # self.cfg.new_impl.include_unit_tests = False
         new_impl_output = self._sample_new_impl(
             imports,
             save_dir=save_dir,
@@ -1102,7 +1092,7 @@ class UpdateManager(Manager):
             "unit_tests": unit_tests,
             "unit_tests_pass_w_update": self.unit_tests_exec_result.pass_w_update,
             "imports": new_impl_output.output["imports"],
-            "new_impl": new_impl_output.output["new_impl"],
+            "implementation": new_impl_output.output["implementation"],
         })
         
         # save content of all update to a json
