@@ -9,6 +9,93 @@ Please check out our work [TBD] 📃
 </picture>
 <br/>
 
+## Reproducing knowledge editing baselines
+
+We provide bash script to run experiment in [scripts](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/scripts) directory. 
+
+The prompt of our experiments could be mainly divided into three parts:
+* `[Update]`: information about the update --- updated function signature, docstring about the update, etc.
+* `[Task]`: task format. We used a discarded `<update, program synthesis>` pair (see [here](./data/example_datum.json)). This data point is discarded only becuase there's not enough program synthesis examples for the update. 
+* `[Test]`: the intended test input
+
+For all of our run scripts, we assume you already set environment variable `MODEL_PATH` to the path of model checkpoint or huggingface id, and `GPU_IDS` (essentially `CUDA_VISIBLE_DEVICES`).
+
+### Prepending
+This experiment corresponds to giving input of the format: `[Update]+[Task]+[Test]` to (any) code generation models. Note, this baseline does not update the knowledge parameter, but learn about the update purely **in-context**.
+
+Simply running the following code will start your first experiment
+
+```bash
+bash scripts/prepend.sh 
+```
+
+To run the experiment without `[Update]` (i.e. `[Task]+[Test]`), we prepare another script:
+```bash
+bash scripts/base.sh 
+```
+
+The default of the code runs with argument `usage=...`. If `eval`, the prompted model will predict solution; if `exec`, we execute the predicted solutions. The scripts for other experiment (as mentioned below) follows the same logic.
+
+We **highly recommend** running code to predict solution (e.g. `usage=eval`) and (e.g. `usage=exec`) separately.
+
+
+### FT (U) [FT=Finetuning]
+
+**Train**: next-token prediction objective on `[Update]`. 
+
+**Test**: input of format `[Task]+[Test]`. 
+
+In our paper, we also include an ablation study that test on `[Update]+[Task]+[Test]`. To conduct experiment for both, run:
+
+```bash
+bash scripts/ft_u.sh
+```
+
+**P.S.** All our FT experiment is finetuning with LoRA.
+
+
+### FT (PS)
+**Train**: SFT, where the context is `[Task]+[Test]` and the response is reference solution.
+
+**Test**: `[Task]+[Test]`.
+
+To conduct experiment for both, run:
+```bash
+bash scripts/ft_ps.sh
+```
+
+
+### FT (U+PS)
+This is very similar to FT(PS), but with update docstring prepended in-context.
+
+**Train**: SFT, where the context is `[Update]+[Task]+[Test]` and the response is reference solution.
+
+**Test**: `[Task]+[Test]`.
+
+In our paper, we also include an ablation study that test on `[Update]+[Task]+[Test]`. To conduct experiment for both, run:
+```bash
+bash scripts/ft_ups.sh
+```
+
+### Specificity
+As a desiderata of model editing, we don't want the model to overfit on the intended `[Update]` and crush the model's other capability. We test so by measure the difference of model's performance on a (fixed) sample of `HumanEval`.
+
+
+To do so, one only need to take the run script of any FT experiment, and set `usage=specificity`. We show an example with FT(U) in script:
+```bash
+bash scripts/specificity.sh
+```
+
+
+### Random-FT
+In the paper, we have an ablation study to understand what the model is actually learning via the fine-tuning process. We fine-tune on program synthesis examples from other random updates.
+
+Like experiment for [specificity](#specificity), one only needs to take the run script of any FT experiment, and set `usage=rand_eval` (also, correspondingly, `usage=rand_exec`). We show some examples in script:
+```bash
+bash scripts/rand_ft.sh
+```
+
+
 ## Description
 
 The goal of our benchmark is to update an LLM about code API update and be able to solve "related" program synthesis example *without providing documentation of the update at inference time*.
@@ -68,10 +155,6 @@ The *goal* of our benchmark is to update an LLM to be able to solve this program
 We provide code for dataset generation in [src/data](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/src/data) directory. The core scripts are `manager_update.py` and `manager_prog_syn.py`, which are pipelines to generate update and program synthesis respectively. Both script follows similar generation procedure but uses different sets of prompts.
 
 We also include the core code to automatically de-duplicate generated program synthesis examples. See `auto-dedup.py` in `scripts` directory.
-
-## Reproducing knowledge editing baselines
-
-We provide bash script to run experiment in [scripts](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/scripts) directory. We **highly recommend** running code to predict solution (e.g. `usage=eval`) and (e.g. `usage=exec`) separately. In each script, we left comments on how to use it.
 
 ## Citation
 
