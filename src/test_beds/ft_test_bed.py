@@ -275,7 +275,7 @@ class FTTestBed(TestBed):
         update2u_datasets = defaultdict(list)
         for u_dataset in self.arena_dataset:
             prog_syn_id = u_dataset["test"][0]["prog_syn_id"]
-            specific_update_id = "/".join(prog_syn_id.split("/")[:-1])
+            specific_update_id = ":".join(prog_syn_id.split(":")[:-1])
             update2u_datasets[specific_update_id].append(u_dataset)
         update2u_datasets = {
             k: sorted(
@@ -347,7 +347,7 @@ class FTTestBed(TestBed):
         update2u_datasets = defaultdict(list)
         for u_dataset in self.arena_dataset:
             prog_syn_id = u_dataset["test"][0]["prog_syn_id"]
-            specific_update_id = "/".join(prog_syn_id.split("/")[:-1])
+            specific_update_id = ":".join(prog_syn_id.split(":")[:-1])
             update2u_datasets[specific_update_id].append(u_dataset)
         update2u_datasets = {
             k: sorted(
