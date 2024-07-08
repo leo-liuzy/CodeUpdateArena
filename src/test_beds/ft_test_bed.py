@@ -260,7 +260,6 @@ class FTTestBed(TestBed):
         
             # refresh peft for next edit
             ft_model.refresh()
-            exit(0)
     
     def evaluate_arena_w_random_update(
         self, 
@@ -332,7 +331,6 @@ class FTTestBed(TestBed):
         
             # refresh peft for next edit
             ft_model.refresh()
-            exit(0)
 
     def evaluate_arena_specificity(
         self, 
@@ -399,7 +397,6 @@ class FTTestBed(TestBed):
         
             # refresh peft for next edit
             ft_model.refresh()
-            exit(0)
     
     def execute_arena(self, save_root, model_name):
         print(f"Evaluating results from: {model_name}")
@@ -454,7 +451,6 @@ class FTTestBed(TestBed):
                 eval_result["specific_update_id"] = test_datum["specific_update_id"]
                 eval_result["prog_syn_id"] = test_datum["prog_syn_id"]
                 json.dump(eval_result, open(f"{save_dir}/eval_result.json", "w"))
-                exit(0)
 
 
 def evaluate(cfg):

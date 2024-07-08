@@ -169,3 +169,5 @@ DUMMY.py
 outputs/
 caches/
 .history/
+tmp/
+evaluation_output/
