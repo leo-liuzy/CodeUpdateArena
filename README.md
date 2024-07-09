@@ -28,7 +28,7 @@ Simply running the following code will start your first experiment with GPT-4 (B
 ```bash
 bash scripts/prepend.sh 
 ```
-Running this script will prompt model to predict solutions (`usage=eval`); and then, execute the predicted solutions (`usage=exec`).
+Running this script will prompt model to predict solutions (`usage=eval`); and then, execute the predicted solutions (`usage=exec`). See the script for more details.
 
 To run the experiment without `[Update]` (i.e. `[Task]+[Test]`), we prepare another script:
 ```bash
