@@ -11,33 +11,31 @@ Please check out our work [TBD] 📃
 
 ## Reproducing knowledge editing baselines
 
-We provide bash script to run experiment in [scripts](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/scripts) directory. 
+We provide bash scripts to run experiment in [scripts](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/scripts) directory. 
 
-The prompt of our experiments could be mainly divided into three parts:
+The prompts of our experiments could be mainly divided into three parts:
 * `[Update]`: information about the update --- updated function signature, docstring about the update, etc.
-* `[Task]`: task format. We used a discarded `<update, program synthesis>` pair (see [here](./data/example_datum.json)). This data point is discarded only becuase there's not enough program synthesis examples for the update. 
+* `[Task]`: task format using an example datum.
 * `[Test]`: the intended test input
 
 For all of our run scripts, we assume you already set environment variable `MODEL_PATH` to the path of model checkpoint or huggingface id, and `GPU_IDS` (essentially `CUDA_VISIBLE_DEVICES`).
 
 ### Prepending
-This experiment corresponds to giving input of the format: `[Update]+[Task]+[Test]` to (any) code generation models. Note, this baseline does not update the knowledge parameter, but learn about the update purely **in-context**.
+This experiment corresponds to giving input of the format: `[Update]+[Task]+[Test]` to (any) code generation models. Note, this baseline does not update the model parameters, but learns about the update purely **in-context**.
 
-Simply running the following code will start your first experiment
+Simply running the following code will start your first experiment with GPT-4 (Be sure to set your environment variable `OPENAI_API_KEY`)
 
 ```bash
 bash scripts/prepend.sh 
 ```
+Running this script will prompt model to predict solutions (`usage=eval`); and then, execute the predicted solutions (`usage=exec`).
 
 To run the experiment without `[Update]` (i.e. `[Task]+[Test]`), we prepare another script:
 ```bash
 bash scripts/base.sh 
 ```
 
-The default of the code runs with argument `usage=...`. If `eval`, the prompted model will predict solution; if `exec`, we execute the predicted solutions. The scripts for other experiment (as mentioned below) follows the same logic.
-
-We **highly recommend** running code to predict solution (e.g. `usage=eval`) and (e.g. `usage=exec`) separately.
-
+To run the code on other model, please set `model.model_name_or_path` to the path to your model directory or some huggingface model id.
 
 ### FT (U) [FT=Finetuning]
 
@@ -45,7 +43,7 @@ We **highly recommend** running code to predict solution (e.g. `usage=eval`) and
 
 **Test**: input of format `[Task]+[Test]`. 
 
-In our paper, we also include an ablation study that test on `[Update]+[Task]+[Test]`. To conduct experiment for both, run:
+In our paper, we also include an ablation study that tests on `[Update]+[Task]+[Test]`. To conduct the experiment for both, run:
 
 ```bash
 bash scripts/ft_u.sh
@@ -59,29 +57,29 @@ bash scripts/ft_u.sh
 
 **Test**: `[Task]+[Test]`.
 
-To conduct experiment for both, run:
+To conduct the experiment for both, run:
 ```bash
 bash scripts/ft_ps.sh
 ```
 
 
 ### FT (U+PS)
-This is very similar to FT(PS), but with update docstring prepended in-context.
+This is very similar to FT(PS), but with the update docstring prepended in-context.
 
 **Train**: SFT, where the context is `[Update]+[Task]+[Test]` and the response is reference solution.
 
 **Test**: `[Task]+[Test]`.
 
-In our paper, we also include an ablation study that test on `[Update]+[Task]+[Test]`. To conduct experiment for both, run:
+In our paper, we also include an ablation study that tests on `[Update]+[Task]+[Test]`. To conduct the experiment for both, run:
 ```bash
 bash scripts/ft_ups.sh
 ```
 
 ### Specificity
-As a desiderata of model editing, we don't want the model to overfit on the intended `[Update]` and crush the model's other capability. We test so by measure the difference of model's performance on a (fixed) sample of `HumanEval`.
+As a desiderata of model editing, we don't want the model to overfit on the intended `[Update]` and crush the model's other capability. We test so by measuring the difference in model's performance on a (fixed) sample of `HumanEval`.
 
 
-To do so, one only need to take the run script of any FT experiment, and set `usage=specificity`. We show an example with FT(U) in script:
+To do so, one only needs to take the run script of any FT experiment, and set `usage=specificity`. We show an example with FT(U) in script:
 ```bash
 bash scripts/specificity.sh
 ```
@@ -90,7 +88,7 @@ bash scripts/specificity.sh
 ### Random-FT
 In the paper, we have an ablation study to understand what the model is actually learning via the fine-tuning process. We fine-tune on program synthesis examples from other random updates.
 
-Like experiment for [specificity](#specificity), one only needs to take the run script of any FT experiment, and set `usage=rand_eval` (also, correspondingly, `usage=rand_exec`). We show some examples in script:
+Like experiment for [specificity](#specificity), one only needs to take the run script of any FT experiment and set `usage=rand_eval` (also, correspondingly, `usage=rand_exec`). We show some examples in the script:
 ```bash
 bash scripts/rand_ft.sh
 ```
@@ -100,7 +98,7 @@ bash scripts/rand_ft.sh
 
 The goal of our benchmark is to update an LLM about code API update and be able to solve "related" program synthesis example *without providing documentation of the update at inference time*.
 
-`CodeUpdateArena` benchmark contains **fictitious** and **executable** updates to 54 functions from 7 diverse Python packages. 
+Our `CodeUpdateArena` benchmark contains **fictitious** and **executable** updates to 54 functions from 7 diverse Python packages. 
 
 An instance in our benchmark consists of a synthetic API function update paired with a program synthesis example that is biased to use the updated functionality. Each fictitious update is paired with at least 3 (executable) program synthesis examples. 
 
@@ -113,7 +111,7 @@ from datasets import load_dataset
 ds = load_dataset("leo-liuzy/CodeUpdateArena")
 ```
 
-The *goal* of our benchmark is to update an LLM to be able to solve this program synthesis example *without providing documentation of the update at inference time*.Our Benchmark is available on HuggingFace 🤗 More benchmark details can be found [here](https://huggingface.co/datasets/leo-liuzy/CodeUpdateArena).
+The *goal* of our benchmark is to update an LLM to be able to solve this program synthesis example *without providing documentation of the update at inference time*. Our Benchmark is available on HuggingFace 🤗 More benchmark details can be found [here](https://huggingface.co/datasets/leo-liuzy/CodeUpdateArena).
 
 
 ### Dataset statistics
@@ -152,9 +150,9 @@ The *goal* of our benchmark is to update an LLM to be able to solve this program
 
 **Check out the details in our paper!**
 
-We provide code for dataset generation in [src/data](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/src/data) directory. The core scripts are `manager_update.py` and `manager_prog_syn.py`, which are pipelines to generate update and program synthesis respectively. Both script follows similar generation procedure but uses different sets of prompts.
+We provide code for dataset generation in [src/data](https://github.com/leo-liuzy/CodeUpdateArena/tree/main/src/data) directory. The core scripts are `manager_update.py` and `manager_prog_syn.py`, which are pipelines to generate updates and program synthesis examples separately. Both scripts follow similar generation procedures but use different sets of prompts.
 
-We also include the core code to automatically de-duplicate generated program synthesis examples. See `auto-dedup.py` in `scripts` directory.
+We also include the core code to automatically de-duplicate generated program synthesis examples. See `auto-dedup.py` in the `scripts` directory.
 
 ## Citation
 
