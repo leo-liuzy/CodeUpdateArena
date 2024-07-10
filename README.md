@@ -2,7 +2,7 @@
 
 **Authors**: Zeyu Leo Liu, Shrey Pandit, Xi Ye, Eunsol Choi, Greg Durrett
 
-Please check out our work [TBD] 📃
+Please check out our work [here](https://arxiv.org/abs/2407.06249) 📃
 
 <picture>
 <img src="./images/dataset-overview.png" alt="Dataset overview"/>
@@ -158,5 +158,13 @@ We also include the core code to automatically de-duplicate generated program sy
 
 If you found our work useful, please consider citing our work.
 ```
-TBD
+@misc{liu2024codeupdatearenabenchmarkingknowledgeediting,
+      title={CodeUpdateArena: Benchmarking Knowledge Editing on API Updates}, 
+      author={Zeyu Leo Liu and Shrey Pandit and Xi Ye and Eunsol Choi and Greg Durrett},
+      year={2024},
+      eprint={2407.06249},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2407.06249}, 
+}
 ```
